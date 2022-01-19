@@ -32,7 +32,8 @@ class DimoLoader:
     def load_scene(self, path):
         scene_id = int(path.name)
         result = {
-            "id": scene_id
+            "id": scene_id,
+            "path": path
         }
         images = []
         with open(path / 'scene_camera.json') as f_scene_camera, \
@@ -62,7 +63,7 @@ class DimoLoader:
 
     def load_camera(self, camera):
         K = np.reshape(camera['cam_K'], (3, 3))
-        T = self.load_pose(camera['cam_R_c2w'], camera['cam_t_c2w'])
+        T = self.load_pose(camera['cam_R_w2c'], camera['cam_t_w2c'])
         return {
             'K': K,
             'cam_2world': T
@@ -75,7 +76,9 @@ class DimoLoader:
             result.append({
                 'id': int(o['obj_id']),
                 'model_2cam': self.load_pose(o['cam_R_m2c'], o['cam_t_m2c']),
-                'model_2world': self.load_pose(o_world['cam_R_m2w'], o_world['cam_t_m2w'])
+                'cam_R_m2c': o['cam_R_m2c'],
+                'cam_t_m2c': o['cam_t_m2c']
+                #'model_2world': self.load_pose(o_world['cam_R_m2w'], o_world['cam_t_m2w'])
             })
         return result
 
