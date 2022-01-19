@@ -1,10 +1,8 @@
 from data.dimo_loader import DimoLoader
 from pathlib import Path
-from bop_toolkit_lib import renderer
 from typing import List
-import matplotlib.pyplot as plt
 import numpy as np
-from bop_toolkit_lib import misc, visibility, inout
+from bop_toolkit_lib import misc, visibility, inout, renderer
 import os
 import shutil
 
@@ -34,7 +32,7 @@ def create_dimo_masks(path: str, subsets: List[str]) -> None:
         subset = dimo_ds[subset_name]
         models = dimo_ds['models']
 
-        for scene in subset:
+        for scene in subset[100:101]:
             masks_path = os.path.join(scene['path'], 'masks/')
             create_or_empty_folder(masks_path)
             ren = renderer.create_renderer(dimo_data['im_width'], dimo_data['im_height'], renderer_type='vispy', mode='depth')
