@@ -32,8 +32,9 @@ def create_dimo_masks(path: str, subsets: List[str]) -> None:
         subset = dimo_ds[subset_name]
         models = dimo_ds['models']
 
-        for scene in subset[100:101]:
+        for scene in subset:
             masks_path = os.path.join(scene['path'], 'masks/')
+            print(f"Processing {scene['path']}")
             create_or_empty_folder(masks_path)
             ren = renderer.create_renderer(dimo_data['im_width'], dimo_data['im_height'], renderer_type='vispy', mode='depth')
 
