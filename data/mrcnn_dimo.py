@@ -12,7 +12,7 @@ import skimage
 class DimoConfig(config.Config):
     NAME = "dimo"
     IMAGES_PER_GPU = 2
-    NUM_CLASSES = 8 + 1 # 8 models + background
+    NUM_CLASSES = 8 + 1     # 8 models + background
     STEPS_PER_EPOCH = 100
     DETECTION_MIN_CONFIDENCE = 0.9
 

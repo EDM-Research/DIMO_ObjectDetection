@@ -1,3 +1,5 @@
+import random
+
 from data.dimo_loader import DimoLoader
 from pathlib import Path
 from typing import List
@@ -68,6 +70,44 @@ def create_dimo_masks(path: str, subsets: List[str]) -> None:
                     inout.save_im(object_mask_path, np.array(mask_visib, dtype=np.uint8))
 
 
+def create_dimo_train_split(path: str, subsets: List[str], train: float = 0.9, val: float = 0.05, test: float = 0.05, seed: int = None) -> None:
+    """
+    Given the path to a dimo dataset, this function will split the scenes of the given subsets in training, validation
+    and testing dataset. The function creates files of name {split}.txt
+    :param path:    path to the dimo dataset
+    :param subsets: subsets to generate split for
+    :param train:   portion of scenes to be training dataset
+    :param val:     portion of scenes to be validation dataset
+    :param test:    portion of scenes to be test dataset
+    :param seed:    optionally set random seed
+    :return:
+    """
+    def write_to_file(file: str, data: list):
+        with open(file, 'w') as f:
+            for element in data:
+                f.write(f"{element}\n")
 
+    if seed:
+        random.seed(seed)
 
+    train /= sum([train, val, test])
+    test /= sum([train, val, test])
+    val /= sum([train, val, test])
+
+    dimo_loader = DimoLoader()
+    dimo_ds = dimo_loader.load(Path(path), cameras=subsets)
+
+    for subset_name in subsets:
+        subset = dimo_ds[subset_name]
+        scene_ids = [scene['id'] for scene in subset]
+        random.shuffle(scene_ids)
+
+        train_ids = scene_ids[:int(train * len(scene_ids))]
+        val_ids = scene_ids[int(train * len(scene_ids)):int((val + train) * len(scene_ids))]
+        test_ids = scene_ids[int((val + train) * len(scene_ids)):]
+
+        subset_path = os.path.join(path, f"{subset_name}/")
+        write_to_file(os.path.join(subset_path, "train.txt"), train_ids)
+        write_to_file(os.path.join(subset_path, "val.txt"), val_ids)
+        write_to_file(os.path.join(subset_path, "test.txt"), test_ids)
 
