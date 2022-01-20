@@ -1,4 +1,5 @@
 import json
+import os
 
 from pathlib import Path
 
@@ -27,7 +28,7 @@ class DimoLoader:
             return result
 
     def load_scenes(self, path):
-        return [self.load_scene(path) for path in sorted(path.glob('[!.]*'))]
+        return [self.load_scene(path) for path in sorted(path.glob('[!.]*')) if os.path.isdir(path)]
 
     def load_scene(self, path):
         scene_id = int(path.name)

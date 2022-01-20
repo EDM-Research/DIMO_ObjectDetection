@@ -18,8 +18,10 @@ class DimoConfig(config.Config):
 
 
 class DIMODataset(utils.Dataset):
-    def load_dataset(self, path: str, subsets: List[str]):
-        # TODO: Implement test/train/val set
+    def load_dataset(self, path: str, subsets: List[str], split: str = "train"):
+        assert split in ["train", "val", "test"]
+        self.split = split
+
         dimo_loader = DimoLoader()
         dimo_ds = dimo_loader.load(Path(path), cameras=subsets)
         image_no = 0
@@ -30,7 +32,10 @@ class DIMODataset(utils.Dataset):
 
         for subset_name in subsets:
             subset = dimo_ds[subset_name]
+            scene_ids = self.get_scene_ids(path, subset_name)
             for scene in subset:
+                if scene['id'] not in scene_ids:
+                    continue
                 masks_path = os.path.join(scene['path'], 'masks/')
                 for image in scene['images']:
                     image_masks_path = os.path.join(masks_path, str(image['id']).zfill(6))
@@ -65,17 +70,30 @@ class DIMODataset(utils.Dataset):
     def image_reference(self, image_id):
         return self.image_info[image_id]['path']
 
+    def get_scene_ids(self, path: str, subset: str) -> List[int]:
+        subset_path = os.path.join(path, subset)
+        split_file_path = os.path.join(subset_path, f"{self.split}.txt")
+        with open(split_file_path, 'r') as f:
+            ids = [int(line.rstrip()) for line in f]
+        return ids
+
 
 if __name__ == "__main__":
+    dataset_train = DIMODataset()
+    dataset_train.load_dataset("F:/Data/dimo", ["sim_jaigo"], split="train")
+    dataset_train.prepare()
 
-    dataset = DIMODataset()
-    dataset.load_dataset("F:/Data/dimo", ["sim_jaigo"])
-    dataset.prepare()
+    dataset_val = DIMODataset()
+    dataset_val.load_dataset("F:/Data/dimo", ["sim_jaigo"], split="val")
+    dataset_val.prepare()
+
+    print(f"training images: {len(dataset_train.image_ids)}")
+    print(f"validation images: {len(dataset_val.image_ids)}")
 
     while True:
-        image_id = random.choice(dataset.image_ids)
-        image = dataset.load_image(image_id)
-        mask, class_ids = dataset.load_mask(image_id)
+        image_id = random.choice(dataset_train.image_ids)
+        image = dataset_train.load_image(image_id)
+        mask, class_ids = dataset_train.load_mask(image_id)
         # Compute Bounding box
         bbox = utils.extract_bboxes(mask)
-        visualize.display_instances(image, bbox, mask, class_ids, dataset.class_names)
+        visualize.display_instances(image, bbox, mask, class_ids, dataset_train.class_names)
