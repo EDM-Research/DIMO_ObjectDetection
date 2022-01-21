@@ -3,7 +3,7 @@ import random
 from mrcnn import utils, visualize, config
 from data.dimo_loader import DimoLoader
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 import os
 import numpy as np
 import skimage
@@ -78,15 +78,18 @@ class DIMODataset(utils.Dataset):
         return ids
 
 
-if __name__ == "__main__":
+def get_dimo_datasets(path: str, subsets: List[str]) -> Tuple[DIMODataset, DIMODataset]:
     dataset_train = DIMODataset()
-    dataset_train.load_dataset("F:/Data/dimo", ["sim_jaigo"], split="train")
+    dataset_train.load_dataset(path, subsets, split="train")
     dataset_train.prepare()
 
     dataset_val = DIMODataset()
-    dataset_val.load_dataset("F:/Data/dimo", ["sim_jaigo"], split="val")
+    dataset_val.load_dataset(path, subsets, split="val")
     dataset_val.prepare()
 
+
+if __name__ == "__main__":
+    dataset_train, dataset_val = get_dimo_datasets("F:/Data/dimo", ["sim_jaigo"])
     print(f"training images: {len(dataset_train.image_ids)}")
     print(f"validation images: {len(dataset_val.image_ids)}")
 

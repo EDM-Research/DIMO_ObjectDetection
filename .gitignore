@@ -134,3 +134,6 @@ Mask_RCNN/
 
 # PyCharm
 .idea/
+
+weights/
+models/
