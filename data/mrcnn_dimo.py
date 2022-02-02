@@ -78,7 +78,7 @@ class DIMODataset(utils.Dataset):
         return ids
 
 
-def get_dimo_datasets(path: str, subsets: List[str]) -> Tuple[DIMODataset, DIMODataset]:
+def get_dimo_datasets(path: str, subsets: List[str]) -> Tuple[DIMODataset, DIMODataset, DimoConfig]:
     dataset_train = DIMODataset()
     dataset_train.load_dataset(path, subsets, split="train")
     dataset_train.prepare()
@@ -87,9 +87,11 @@ def get_dimo_datasets(path: str, subsets: List[str]) -> Tuple[DIMODataset, DIMOD
     dataset_val.load_dataset(path, subsets, split="val")
     dataset_val.prepare()
 
+    return dataset_train, dataset_val, DimoConfig()
+
 
 if __name__ == "__main__":
-    dataset_train, dataset_val = get_dimo_datasets("F:/Data/dimo", ["sim_jaigo"])
+    dataset_train, dataset_val, _ = get_dimo_datasets("F:/Data/dimo", ["sim_jaigo"])
     print(f"training images: {len(dataset_train.image_ids)}")
     print(f"validation images: {len(dataset_val.image_ids)}")
 
