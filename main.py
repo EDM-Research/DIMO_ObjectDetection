@@ -38,5 +38,5 @@ def show_subsets(subsets):
 
 if __name__ == "__main__":
     os.environ["DEBUG_MODE"] = "1"
-    #prepare_subsets(["sim_jaigo_real_light_rand_pose"])
-    train_subsets(["real_jaigo_000-150"])
+    prepare_subsets(["sim_jaigo_real_light_rand_pose"])
+    #train_subsets(["real_jaigo_000-150"])

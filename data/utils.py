@@ -14,6 +14,11 @@ dimo_data = {
 }
 
 
+def create_or_ignore_folder(path: str):
+    if not os.path.exists(path):
+        os.mkdir(path)
+
+
 def create_or_empty_folder(path: str):
     if os.path.exists(path):
         shutil.rmtree(path)
@@ -41,14 +46,15 @@ def create_dimo_masks(path: str, subsets: List[str]) -> None:
         subset = dimo_ds[subset_name]
         models = dimo_ds['models']
 
+        ren = renderer.create_renderer(dimo_data['im_width'], dimo_data['im_height'], renderer_type='vispy', mode='depth')
+        for model in models:
+            ren.add_object(model['id'], model['cad'])
+
         for scene in subset:
             masks_path = os.path.join(scene['path'], 'masks/')
             print(f"Processing {scene['path']}")
-            create_or_empty_folder(masks_path)
-            ren = renderer.create_renderer(dimo_data['im_width'], dimo_data['im_height'], renderer_type='vispy', mode='depth')
+            create_or_ignore_folder(masks_path)
 
-            for model in models:
-                ren.add_object(model['id'], model['cad'])
             for image in scene['images']:
                 camera = image['camera']
                 image_masks_path = os.path.join(masks_path, str(image['id']).zfill(6))
