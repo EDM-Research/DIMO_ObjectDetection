@@ -20,6 +20,13 @@ def create_or_empty_folder(path: str):
     os.mkdir(path)
 
 
+def get_file_count(path: str) -> int:
+    if not os.path.exists(path):
+        return 0
+    else:
+        return len(os.listdir(path))
+
+
 def create_dimo_masks(path: str, subsets: List[str]) -> None:
     """
     Generates the visible mask for each object in each image.
@@ -45,6 +52,10 @@ def create_dimo_masks(path: str, subsets: List[str]) -> None:
             for image in scene['images']:
                 camera = image['camera']
                 image_masks_path = os.path.join(masks_path, str(image['id']).zfill(6))
+
+                if get_file_count(image_masks_path) == len(image['objects']):
+                    continue
+
                 create_or_empty_folder(image_masks_path)
                 K = camera['K']
                 fx, fy, cx, cy = K[0, 0], K[1, 1], K[0, 2], K[1, 2]
