@@ -13,7 +13,7 @@ class DimoConfig(config.Config):
     NAME = "dimo"
     IMAGES_PER_GPU = 2
     NUM_CLASSES = 8 + 1     # 8 models + background
-    STEPS_PER_EPOCH = 100
+    STEPS_PER_EPOCH = 1000
     DETECTION_MIN_CONFIDENCE = 0.9
 
 
@@ -86,12 +86,11 @@ def get_dimo_datasets(path: str, subsets: List[str]) -> Tuple[DIMODataset, DIMOD
     dataset_val = DIMODataset()
     dataset_val.load_dataset(path, subsets, split="val")
     dataset_val.prepare()
-
     return dataset_train, dataset_val, DimoConfig()
 
 
 if __name__ == "__main__":
-    dataset_train, dataset_val, _ = get_dimo_datasets("F:/Data/dimo", ["sim_jaigo"])
+    dataset_train, dataset_val, _ = get_dimo_datasets("D:/Datasets/DIMO/dimo", ["real_jaigo_000-150"])
     print(f"training images: {len(dataset_train.image_ids)}")
     print(f"validation images: {len(dataset_val.image_ids)}")
 
