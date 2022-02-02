@@ -6,7 +6,7 @@ COCO_WEIGHTS_PATH = 'weights/mask_rcnn_coco.h5'
 
 def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Config, use_coco_weights: bool = True):
     model = modellib.MaskRCNN(mode="training", config=config,
-                              model_dir='/models')
+                              model_dir='models')
 
     if use_coco_weights:
         weights_path = COCO_WEIGHTS_PATH
