@@ -73,7 +73,7 @@ class DimoLoader:
     def load_objects(self, scene_gt, scene_gt_world):
         result = []
         for o, o_world in zip(scene_gt, scene_gt_world):
-            assert o['obj_id'] == o_world['obj_id']
+            #assert o['obj_id'] == o_world['obj_id']
             result.append({
                 'id': int(o['obj_id']),
                 'model_2cam': self.load_pose(o['cam_R_m2c'], o['cam_t_m2c']),
