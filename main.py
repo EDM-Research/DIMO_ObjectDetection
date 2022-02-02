@@ -1,6 +1,7 @@
 from data import utils
 from data import mrcnn_dimo
 from training import mrcnn
+import os
 
 DIMO_PATH = "D:/Datasets/DIMO/dimo"
 
@@ -20,4 +21,5 @@ def prepare_subsets(subsets):
 
 
 if __name__ == "__main__":
+    #os.environ['DEBUG_MODE'] = '1'
     train_subsets(["real_jaigo_000-150"])
