@@ -65,7 +65,7 @@ class DIMODataset(utils.Dataset):
             if file.endswith(".png"):
                 masks[:, :, object_count] = skimage.io.imread(os.path.join(image_info["masks_path"], file))
                 object_count += 1
-        return masks.astype(bool), np.array(image_info["instance_ids"])
+        return masks.astype(np.uint8), np.array(image_info["instance_ids"], dtype=np.int32)
 
     def image_reference(self, image_id):
         return self.image_info[image_id]['path']
@@ -87,17 +87,3 @@ def get_dimo_datasets(path: str, subsets: List[str]) -> Tuple[DIMODataset, DIMOD
     dataset_val.load_dataset(path, subsets, split="val")
     dataset_val.prepare()
     return dataset_train, dataset_val, DimoConfig()
-
-
-if __name__ == "__main__":
-    dataset_train, dataset_val, _ = get_dimo_datasets("D:/Datasets/DIMO/dimo", ["real_jaigo_000-150"])
-    print(f"training images: {len(dataset_train.image_ids)}")
-    print(f"validation images: {len(dataset_val.image_ids)}")
-
-    while True:
-        image_id = random.choice(dataset_train.image_ids)
-        image = dataset_train.load_image(image_id)
-        mask, class_ids = dataset_train.load_mask(image_id)
-        # Compute Bounding box
-        bbox = utils.extract_bboxes(mask)
-        visualize.display_instances(image, bbox, mask, class_ids, dataset_train.class_names)
