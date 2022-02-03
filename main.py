@@ -4,8 +4,12 @@ from data import mrcnn_dimo
 import os, random
 from mrcnn import utils, visualize
 from training import evaluation
+import configparser
 
-DIMO_PATH = "D:/Datasets/DIMO/dimo"
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+DIMO_PATH = config['USER_SETTINGS']['dimo_path']
 
 
 def train_subsets(subsets):

@@ -23,7 +23,13 @@ To install either of those versions:
 
 ## Dataset
 
-Download the [DIMO dataset](https://github.com/pderoovere/dimo) base and the desired subsets. Set the `DIMO_PATH` in `main.py` to the download location.
+Create a file named `config.ini` with the following contents:
+```
+[USER_SETTINGS]
+dimo_path = **dimo path**
+```
+Download the [DIMO dataset](https://github.com/pderoovere/dimo) base and the desired subsets.
+Set the `DIMO_PATH` in `config.ini` to the download location.
 
 ## Use
 
