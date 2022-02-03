@@ -18,6 +18,13 @@ class DimoConfig(config.Config):
     TRAIN_ROIS_PER_IMAGE = 50
 
 
+class DimoInferenceConfig(config.Config):
+    NAME = "dimo"
+    IMAGES_PER_GPU = 1
+    NUM_CLASSES = 8 + 1     # 8 models + background
+    DETECTION_MIN_CONFIDENCE = 0.5
+
+
 class DIMODataset(utils.Dataset):
     def load_dataset(self, path: str, subsets: List[str], split: str = "train"):
         assert split in ["train", "val", "test"]
@@ -88,3 +95,10 @@ def get_dimo_datasets(path: str, subsets: List[str]) -> Tuple[DIMODataset, DIMOD
     dataset_val.load_dataset(path, subsets, split="val")
     dataset_val.prepare()
     return dataset_train, dataset_val, DimoConfig()
+
+
+def get_test_dimo_dataset(path: str, subsets: List[str]) -> Tuple[DIMODataset, DimoInferenceConfig]:
+    dataset = DIMODataset()
+    dataset.load_dataset(path, subsets, split="test")
+    dataset.prepare()
+    return dataset, DimoInferenceConfig()

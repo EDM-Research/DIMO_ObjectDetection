@@ -1,8 +1,9 @@
+import data.mrcnn_dimo
 from data import utils as data_utils
 from data import mrcnn_dimo
 import os, random
 from mrcnn import utils, visualize
-
+from training import evaluation
 
 DIMO_PATH = "D:/Datasets/DIMO/dimo"
 
@@ -35,6 +36,18 @@ def show_subsets(subsets):
         # Compute Bounding box
         bbox = utils.extract_bboxes(mask)
         visualize.display_instances(image, bbox, mask, class_ids, dataset_train.class_names)
+
+
+def test_subsets(subsets, model_dir):
+    iou = 0.5
+    dataset, config = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, subsets)
+    model = evaluation.load_model(model_dir, config)
+    results = evaluation.get_detections(dataset, model, config)
+    map = evaluation.compute_map(results, dataset, config, iou)
+
+    print(f"maP @ iou = {iou} = {map}")
+
+    evaluation.show_results(results, dataset)
 
 
 if __name__ == "__main__":
