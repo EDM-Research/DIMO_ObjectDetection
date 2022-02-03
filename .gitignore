@@ -131,6 +131,7 @@ dmypy.json
 # libraries
 bop_toolkit/
 Mask_RCNN/
+mrcnn/
 
 # PyCharm
 .idea/
