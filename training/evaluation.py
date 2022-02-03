@@ -14,7 +14,8 @@ def load_model(model_dir: str, config: Config) -> modellib.MaskRCNN:
 def get_detections(dataset: Dataset, model: modellib.MaskRCNN, config: Config) -> list:
     results = []
 
-    for image_id in dataset.image_ids:
+    for i, image_id in enumerate(dataset.image_ids):
+        print(f"Testing image {i}/{len(dataset.image_ids)}", end='\r')
         image = dataset.load_image(image_id)
         result = model.detect([image], verbose=0)[0]
         result['image_id'] = image_id
