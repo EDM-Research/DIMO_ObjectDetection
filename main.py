@@ -5,7 +5,7 @@ import os, random
 from mrcnn import utils, visualize
 from training import evaluation
 
-DIMO_PATH = "D:/Datasets/DIMO/dimo"
+DIMO_PATH = "F:/Data/dimo"
 
 
 def train_subsets(subsets):
@@ -38,19 +38,18 @@ def show_subsets(subsets):
         visualize.display_instances(image, bbox, mask, class_ids, dataset_train.class_names)
 
 
-def test_subsets(subsets, model_dir):
+def test_subsets(subsets, model_id):
     iou = 0.5
     dataset, config = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, subsets)
-    model = evaluation.load_model(model_dir, config)
-    results = evaluation.get_detections(dataset, model)
+    model = evaluation.load_model(model_id, config)
+    results = evaluation.get_detections(dataset, model, config)
     map = evaluation.compute_map(results, dataset, config, iou)
 
     print(f"maP @ iou = {iou} = {map}")
 
-    evaluation.show_results(results, dataset)
+    evaluation.show_results(results, dataset, config)
 
 
 if __name__ == "__main__":
-    os.environ["DEBUG_MODE"] = "1"
-    #prepare_subsets(["sim_jaigo_real_light_rand_pose"])
-    train_subsets(["sim_jaigo_real_light_real_pose"])
+    os.environ["DEBUG_MODE"] = "0"
+    test_subsets(["real_jaigo_000-150"], 'dimo20220202T1005')
