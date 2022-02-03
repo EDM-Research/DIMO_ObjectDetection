@@ -5,7 +5,7 @@ import os, random
 from mrcnn import utils, visualize
 from training import evaluation
 
-DIMO_PATH = "F:/Data/dimo"
+DIMO_PATH = "D:/Datasets/DIMO/dimo"
 
 
 def train_subsets(subsets):
@@ -51,5 +51,5 @@ def test_subsets(subsets, model_id):
 
 
 if __name__ == "__main__":
-    os.environ["DEBUG_MODE"] = "0"
-    test_subsets(["real_jaigo_000-150"], 'dimo20220202T1005')
+    os.environ["DEBUG_MODE"] = "1"
+    test_subsets(["real_jaigo_000-150"], 'dimo20220202T1632')

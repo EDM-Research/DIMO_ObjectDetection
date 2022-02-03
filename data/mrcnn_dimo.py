@@ -16,6 +16,7 @@ class DimoConfig(config.Config):
     STEPS_PER_EPOCH = 1000
     DETECTION_MIN_CONFIDENCE = 0.9
     TRAIN_ROIS_PER_IMAGE = 50
+    USE_MINI_MASK = False
 
 
 class DimoInferenceConfig(config.Config):
@@ -23,6 +24,7 @@ class DimoInferenceConfig(config.Config):
     IMAGES_PER_GPU = 1
     NUM_CLASSES = 8 + 1     # 8 models + background
     DETECTION_MIN_CONFIDENCE = 0.5
+    USE_MINI_MASK = False
 
 
 class DIMODataset(utils.Dataset):

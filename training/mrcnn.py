@@ -1,5 +1,5 @@
 from mrcnn import config, utils, model as modellib
-import augmentation
+from training import augmentation
 import os
 
 COCO_WEIGHTS_PATH = 'weights/mask_rcnn_coco.h5'
