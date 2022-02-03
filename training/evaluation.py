@@ -2,6 +2,7 @@ from mrcnn.utils import Dataset, compute_ap
 from mrcnn.config import Config
 import mrcnn.model as modellib
 import numpy as np
+from mrcnn import visualize
 
 
 class DimoInferenceConfig(Config):
@@ -21,7 +22,7 @@ def get_detections(dataset: Dataset, model: modellib.MaskRCNN, config: Config) -
     results = []
 
     for image_id in dataset.image_ids:
-        image, *_ = modellib.load_image_gt(dataset, config, image_id, use_mini_mask=False)
+        image = dataset.load_image(image_id)
         result = model.detect([image], verbose=0)[0]
         result['image_id'] = image_id
         results.append(result)
@@ -49,3 +50,9 @@ def compute_map(results: list, dataset: Dataset, config: Config, iou_threshold: 
         aps.append(ap)
 
     return np.mean(aps)
+
+
+def show_results(results: list, dataset: Dataset):
+    for result in results:
+        image = dataset.load_image(result['image_id'])
+        visualize.display_instances(image, result['rois'], result['masks'], result['class_ids'], dataset.class_names)
