@@ -1,6 +1,5 @@
 from data import utils as data_utils
 from data import mrcnn_dimo
-from training import mrcnn
 import os, random
 from mrcnn import utils, visualize
 
@@ -9,6 +8,8 @@ DIMO_PATH = "D:/Datasets/DIMO/dimo"
 
 
 def train_subsets(subsets):
+    from training import mrcnn
+
     train, val, _ = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets)
 
     print(f"training images: {len(train.image_ids)}")
@@ -38,5 +39,5 @@ def show_subsets(subsets):
 
 if __name__ == "__main__":
     os.environ["DEBUG_MODE"] = "1"
-    prepare_subsets(["sim_jaigo_real_light_rand_pose"])
-    #train_subsets(["real_jaigo_000-150"])
+    #prepare_subsets(["sim_jaigo_real_light_rand_pose"])
+    train_subsets(["sim_jaigo_real_light_real_pose"])
