@@ -4,6 +4,19 @@ import mrcnn.model as modellib
 import numpy as np
 
 
+class DimoInferenceConfig(Config):
+    NAME = "dimo"
+    IMAGES_PER_GPU = 1
+    NUM_CLASSES = 8 + 1     # 8 models + background
+    DETECTION_MIN_CONFIDENCE = 0.5
+
+
+def load_model(model_dir: str) -> modellib.MaskRCNN:
+    model = modellib.MaskRCNN(mode="inference", config=DimoInferenceConfig(), model_dir=f"models/{model_dir}")
+    model.load_weights(model.find_last())
+    return model
+
+
 def get_detections(dataset: Dataset, model: modellib.MaskRCNN, config: Config) -> list:
     results = []
 
