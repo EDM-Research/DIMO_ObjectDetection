@@ -11,7 +11,7 @@ def load_model(model_dir: str, config: Config) -> modellib.MaskRCNN:
     return model
 
 
-def get_detections(dataset: Dataset, model: modellib.MaskRCNN, config: Config) -> list:
+def get_detections(dataset: Dataset, model: modellib.MaskRCNN) -> list:
     results = []
 
     for i, image_id in enumerate(dataset.image_ids):

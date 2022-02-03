@@ -42,7 +42,7 @@ def test_subsets(subsets, model_dir):
     iou = 0.5
     dataset, config = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, subsets)
     model = evaluation.load_model(model_dir, config)
-    results = evaluation.get_detections(dataset, model, config)
+    results = evaluation.get_detections(dataset, model)
     map = evaluation.compute_map(results, dataset, config, iou)
 
     print(f"maP @ iou = {iou} = {map}")
