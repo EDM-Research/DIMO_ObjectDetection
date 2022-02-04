@@ -1,10 +1,14 @@
+import cv2.cv2
+
 import data.mrcnn_dimo
 from data import utils as data_utils
 from data import mrcnn_dimo
 import os, random
 from mrcnn import utils, visualize
+from mrcnn import model as modellib
 from training import evaluation
 import configparser
+import matplotlib.pyplot as plt
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -29,17 +33,16 @@ def prepare_subsets(subsets):
 
 
 def show_subsets(subsets):
-    dataset_train, dataset_val, _ = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets)
+    dataset_train, dataset_val, config = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets)
     print(f"training images: {len(dataset_train.image_ids)}")
     print(f"validation images: {len(dataset_val.image_ids)}")
 
     while True:
         image_id = random.choice(dataset_train.image_ids)
-        image = dataset_train.load_image(image_id)
-        mask, class_ids = dataset_train.load_mask(image_id)
+        image_info = dataset_train.image_info[image_id]
+        image, image_meta, gt_class_id, gt_bbox, gt_mask = modellib.load_image_gt(dataset_train, config, image_id)
         # Compute Bounding box
-        bbox = utils.extract_bboxes(mask)
-        visualize.display_instances(image, bbox, mask, class_ids, dataset_train.class_names)
+        visualize.display_instances(image, gt_bbox, gt_mask, gt_class_id, dataset_train.class_names, title=image_info['id'])
 
 
 def test_subsets(subsets, model_id):
@@ -55,5 +58,5 @@ def test_subsets(subsets, model_id):
 
 
 if __name__ == "__main__":
-    os.environ["DEBUG_MODE"] = "1"
-    test_subsets(["real_jaigo_000-150"], 'dimo20220202T1632')
+    os.environ["DEBUG_MODE"] = "0"
+    show_subsets(["real_jaigo_000-150"])

@@ -11,12 +11,11 @@ import skimage
 
 class DimoConfig(config.Config):
     NAME = "dimo"
-    IMAGES_PER_GPU = 2
+    IMAGES_PER_GPU = 1
+    USE_MINI_MASK = True
     NUM_CLASSES = 8 + 1     # 8 models + background
     STEPS_PER_EPOCH = 1000
-    DETECTION_MIN_CONFIDENCE = 0.9
     TRAIN_ROIS_PER_IMAGE = 50
-    USE_MINI_MASK = False
 
 
 class DimoInferenceConfig(config.Config):
