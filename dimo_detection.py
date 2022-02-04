@@ -6,12 +6,14 @@ parser = argparse.ArgumentParser()
 parser.add_argument('action', type=str)
 parser.add_argument('--subsets', required=True, type=str, nargs='+')
 parser.add_argument('--model', type=str)
+parser.add_argument('-o', action='store_true')
 args = parser.parse_args()
 
 action = args.action
 
 if action == 'prepare':
-    prepare_subsets(args.subsets)
+    override = args.o
+    prepare_subsets(args.subsets, override)
 elif action == 'show':
     show_subsets(args.subsets)
 elif action == 'train':

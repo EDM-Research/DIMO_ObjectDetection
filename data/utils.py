@@ -33,10 +33,11 @@ def get_file_count(path: str) -> int:
         return len(os.listdir(path))
 
 
-def create_dimo_masks(path: str, subsets: List[str]) -> None:
+def create_dimo_masks(path: str, subsets: List[str], override: bool = False) -> None:
     """
     Generates the visible mask for each object in each image.
     Masks are saved separately as a binary image for each object under {scene_id}/masks/{image_id}/{object_no}.png
+    :param override: masks that are already generated are ignored if set to false, otherwise new masks are generated
     :param path: path to DIMO dataset
     :param subsets: subsets of dimo dataset to generate masks for (eg. sim_jaigo)
     """
@@ -54,7 +55,11 @@ def create_dimo_masks(path: str, subsets: List[str]) -> None:
         for scene in subset:
             masks_path = os.path.join(scene['path'], 'masks/')
             print(f"Processing {scene['path']}")
-            create_or_ignore_folder(masks_path)
+
+            if override:
+                create_or_empty_folder(masks_path)
+            else:
+                create_or_ignore_folder(masks_path)
 
             for image in scene['images']:
                 camera = image['camera']

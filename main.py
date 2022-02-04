@@ -27,8 +27,8 @@ def train_subsets(subsets):
     mrcnn.train(train, val, mrcnn_dimo.DimoConfig(), False)
 
 
-def prepare_subsets(subsets):
-    data_utils.create_dimo_masks(DIMO_PATH, subsets)
+def prepare_subsets(subsets, override: bool = False):
+    data_utils.create_dimo_masks(DIMO_PATH, subsets, override=override)
     data_utils.create_dimo_train_split(DIMO_PATH, subsets, seed=10)
 
 
@@ -59,4 +59,4 @@ def test_subsets(subsets, model_id):
 
 if __name__ == "__main__":
     os.environ["DEBUG_MODE"] = "0"
-    prepare_subsets(["debug"])
+    prepare_subsets(["debug"], False)
