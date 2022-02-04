@@ -16,6 +16,7 @@ class DimoConfig(config.Config):
     NUM_CLASSES = 8 + 1     # 8 models + background
     STEPS_PER_EPOCH = 1000
     TRAIN_ROIS_PER_IMAGE = 50
+    LEARNING_RATE = 0.0001
 
 
 class DimoInferenceConfig(config.Config):
@@ -36,8 +37,11 @@ class DIMODataset(utils.Dataset):
         image_no = 0
         debug = os.environ.get("DEBUG_MODE", "0") == "1"
 
-        for model in dimo_ds['models']:
-            self.add_class("dimo", int(model['id']), str(model['id']))
+        model_to_id = {}
+
+        for i, model in enumerate(dimo_ds['models']):
+            self.add_class("dimo", i + 1, str(model['id']))
+            model_to_id[str(model['id'])] = i + 1
 
         for subset_name in subsets:
             subset = dimo_ds[subset_name]
@@ -48,7 +52,7 @@ class DIMODataset(utils.Dataset):
                 masks_path = os.path.join(scene['path'], 'masks/')
                 for image in scene['images']:
                     image_masks_path = os.path.join(masks_path, str(image['id']).zfill(6))
-                    instance_ids = [obj['id'] for obj in image['objects']]
+                    instance_ids = [model_to_id[str(obj['id'])] for obj in image['objects']]
                     image_data = skimage.io.imread(image['path'])
                     height, width = image_data.shape[:2]
 

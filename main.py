@@ -58,5 +58,5 @@ def test_subsets(subsets, model_id):
 
 
 if __name__ == "__main__":
-    os.environ["DEBUG_MODE"] = "0"
-    prepare_subsets(["debug"], False)
+    os.environ["DEBUG_MODE"] = "1"
+    show_subsets(["real_jaigo_000-150"])

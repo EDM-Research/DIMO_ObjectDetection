@@ -10,6 +10,8 @@ def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Confi
     model = modellib.MaskRCNN(mode="training", config=config,
                               model_dir='models')
 
+    print(f"Saving model to {model.log_dir}\n")
+
     if use_coco_weights:
         weights_path = COCO_WEIGHTS_PATH
         if not os.path.exists(weights_path):
