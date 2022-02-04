@@ -16,7 +16,7 @@ config.read('config.ini')
 DIMO_PATH = config['USER_SETTINGS']['dimo_path']
 
 
-def train_subsets(subsets):
+def train_subsets(subsets, augment: bool = False, transfer_learning: bool = False):
     from training import mrcnn
 
     train, val, _ = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets)
@@ -24,7 +24,7 @@ def train_subsets(subsets):
     print(f"training images: {len(train.image_ids)}")
     print(f"validation images: {len(val.image_ids)}")
 
-    mrcnn.train(train, val, mrcnn_dimo.DimoConfig(), False)
+    mrcnn.train(train, val, mrcnn_dimo.DimoConfig(), augment=augment, use_coco_weights=transfer_learning)
 
 
 def prepare_subsets(subsets, override: bool = False):
