@@ -7,6 +7,7 @@ import numpy as np
 from bop_toolkit_lib import misc, visibility, inout, renderer
 import os
 import shutil
+import time
 
 dimo_data = {
     'im_width': 2560,
@@ -83,7 +84,7 @@ def create_dimo_masks(path: str, subsets: List[str]) -> None:
 
                 for object_no, dist_map in enumerate(distance_maps):
                     object_mask_path = os.path.join(image_masks_path, f"{object_no}.png")
-                    mask_visib = visibility.estimate_visib_mask_gt(dist_image, dist_map, 15, visib_mode='bop19') * 255
+                    mask_visib = visibility.estimate_visib_mask_gt(dist_image, dist_map, 1, visib_mode='bop19') * 255
                     inout.save_im(object_mask_path, np.array(mask_visib, dtype=np.uint8))
 
 
