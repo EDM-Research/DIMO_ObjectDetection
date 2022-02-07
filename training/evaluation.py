@@ -25,8 +25,9 @@ def get_file_for_epoch(model_dir: str, epoch: int = None) -> str:
     return last_epoch_file
 
 
-def load_model(model_id: str, config: Config, epoch: int = None) -> modellib.MaskRCNN:
-    model = modellib.MaskRCNN(mode="inference", config=config, model_dir=f"/models")
+def load_model(model_id: str, config: Config, epoch: int = None, mode: str = "inference") -> modellib.MaskRCNN:
+    assert mode in ["training", "inference"], f"Mode can only be training or inference, not {mode}"
+    model = modellib.MaskRCNN(mode=mode, config=config, model_dir=f"/models")
     model_file = get_file_for_epoch(f"models/{model_id}", epoch)
     model_path = f"models/{model_id}/{model_file}"
     print(f"Loading model from {model_path}")

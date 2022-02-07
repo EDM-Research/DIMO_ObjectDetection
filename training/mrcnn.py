@@ -5,10 +5,12 @@ import os
 COCO_WEIGHTS_PATH = 'weights/mask_rcnn_coco.h5'
 
 
-def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Config, use_coco_weights: bool = True, augment: bool = True):
+def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Config, use_coco_weights: bool = True, augment: bool = True, checkpoint_model: modellib.MaskRCNN = None):
     augmenters = augmentation.augmenters if augment else None
-    model = modellib.MaskRCNN(mode="training", config=config,
-                              model_dir='models')
+    if checkpoint_model:
+        model = checkpoint_model
+    else:
+        model = modellib.MaskRCNN(mode="training", config=config, model_dir='models')
 
     print(f"Saving model to {model.log_dir}\n")
 

@@ -16,15 +16,17 @@ config.read('config.ini')
 DIMO_PATH = config['USER_SETTINGS']['dimo_path']
 
 
-def train_subsets(subsets, augment: bool = False, transfer_learning: bool = False):
+def train_subsets(subsets, model_id=None, augment: bool = False, transfer_learning: bool = False):
     from training import mrcnn
 
-    train, val, _ = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets)
+    train, val, config = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets)
+
+    model = evaluation.load_model(model_id, config, mode="training") if model_id else None
 
     print(f"training images: {len(train.image_ids)}")
     print(f"validation images: {len(val.image_ids)}")
 
-    mrcnn.train(train, val, mrcnn_dimo.DimoConfig(), augment=augment, use_coco_weights=transfer_learning)
+    mrcnn.train(train, val, config, augment=augment, use_coco_weights=transfer_learning, checkpoint_model=model)
 
 
 def prepare_subsets(subsets, override: bool = False):
@@ -59,4 +61,4 @@ def test_subsets(subsets, model_id):
 
 if __name__ == "__main__":
     os.environ["DEBUG_MODE"] = "1"
-    show_subsets(["real_jaigo_000-150"])
+    train_subsets(["real_jaigo_000-150"], "dimo20220204T1412")
