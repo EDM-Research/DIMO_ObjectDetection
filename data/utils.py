@@ -1,18 +1,31 @@
+import json
 import random
 
 from data.dimo_loader import DimoLoader
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 import numpy as np
 from bop_toolkit_lib import misc, visibility, inout, renderer
 import os
 import shutil
-import time
+import cv2
 
 dimo_data = {
     'im_width': 2560,
     'im_height': 2048
 }
+
+
+def get_bbox(img: np.array) -> Tuple[int, int, int, int]:
+    if not np.any(img):
+        return 0, 0, 0, 0
+
+    rows = np.any(img, axis=1)
+    cols = np.any(img, axis=0)
+    y_min, y_max = np.where(rows)[0][[0, -1]]
+    x_min, x_max = np.where(cols)[0][[0, -1]]
+
+    return x_min, x_max, y_min, y_max
 
 
 def create_or_ignore_folder(path: str):
@@ -134,3 +147,42 @@ def create_dimo_train_split(path: str, subsets: List[str], train: float = 0.9, v
         write_to_file(os.path.join(subset_path, "val.txt"), val_ids)
         write_to_file(os.path.join(subset_path, "test.txt"), test_ids)
 
+
+def dimo_to_createml(path: str):
+    annotations = []
+
+    scenes = [scene for scene in os.listdir(path) if os.path.isdir(os.path.join(path, scene))]
+
+    for scene in scenes:
+        scene_path = os.path.join(path, scene)
+        masks_path = os.path.join(scene_path, 'mask_visib/')
+
+        with open(os.path.join(scene_path, "scene_gt.json"), 'r') as f:
+            scene_dict = json.load(f)
+            for image in scene_dict.keys():
+                annotation_dict = {
+                    "image": f"{scene.zfill(6)}/rgb/{image.zfill(6)}.jpg",
+                    "annotations": []
+                }
+                for object in scene_dict[image]:
+                    mask_file = f"{image.zfill(6)}_{str(object['obj_id']).zfill(6)}.jpg"
+                    mask_path = os.path.join(masks_path, mask_file)
+                    mask_image = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+                    x_min, x_max, y_min, y_max = get_bbox(mask_image)
+                    annotation_dict["annotations"].append({
+                        "label": str(object['obj_id']),
+                        "coordinates": {
+                            "x": int(x_min),
+                            "y": int(y_min),
+                            "width": int(x_max - x_min),
+                            "height": int(y_max - y_min)
+                        }
+                    })
+                annotations.append(annotation_dict)
+
+    with open(os.path.join(path, "createml.json"), 'w') as f:
+        json.dump(annotations, f)
+
+
+if __name__ == "__main__":
+    dimo_to_createml("E:/projects/renderings/deo/bop/train_PBR/")
