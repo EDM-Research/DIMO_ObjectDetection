@@ -19,7 +19,8 @@ DIMO_PATH = config['USER_SETTINGS']['dimo_path']
 def train_subsets(subsets, model_id=None, augment: bool = False, transfer_learning: bool = False):
     from training import mrcnn
 
-    train, val, config = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets)
+    train, val = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets)
+    config = mrcnn_dimo.DimoConfig()
 
     model = evaluation.load_model(model_id, config, mode="training") if model_id else None
 
@@ -35,7 +36,9 @@ def prepare_subsets(subsets, override: bool = False):
 
 
 def show_subsets(subsets):
-    dataset_train, dataset_val, config = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets)
+    dataset_train, dataset_val = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets)
+    config = mrcnn_dimo.DimoInferenceConfig()
+
     print(f"training images: {len(dataset_train.image_ids)}")
     print(f"validation images: {len(dataset_val.image_ids)}")
 
@@ -49,7 +52,8 @@ def show_subsets(subsets):
 
 def test_subsets(subsets, model_id):
     iou = 0.5
-    dataset, config = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, subsets)
+    dataset = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, subsets)
+    config = mrcnn_dimo.DimoInferenceConfig()
     model = evaluation.load_model(model_id, config)
     results = evaluation.get_detections(dataset, model, config)
     map = evaluation.compute_map(results, dataset, config, iou)
@@ -61,4 +65,4 @@ def test_subsets(subsets, model_id):
 
 if __name__ == "__main__":
     os.environ["DEBUG_MODE"] = "1"
-    train_subsets(["real_jaigo_000-150"])
+    show_subsets(["sim_jaigo"])

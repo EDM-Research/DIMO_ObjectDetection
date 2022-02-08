@@ -49,10 +49,14 @@ class DIMODataset(utils.Dataset):
             for scene in subset:
                 if scene['id'] not in scene_ids:
                     continue
-                masks_path = os.path.join(scene['path'], 'masks/')
+                masks_path = os.path.join(scene['path'], 'mask_visib/')
                 for image in scene['images']:
-                    image_masks_path = os.path.join(masks_path, str(image['id']).zfill(6))
-                    instance_ids = [model_to_id[str(obj['id'])] for obj in image['objects']]
+                    instance_masks = []
+                    instance_ids = []
+                    for i, object in enumerate(image['objects']):
+                        instance_ids.append(model_to_id[str(object['id'])])
+                        instance_masks.append(os.path.join(masks_path, f"{str(image['id']).zfill(6)}_{str(i).zfill(6)}.png"))
+
                     image_data = skimage.io.imread(image['path'])
                     height, width = image_data.shape[:2]
 
@@ -60,7 +64,7 @@ class DIMODataset(utils.Dataset):
                         "dimo",
                         image_id=f"{subset_name}_{scene['id']}_{image['id']}",
                         path=image['path'],
-                        masks_path=image_masks_path,
+                        instance_masks=instance_masks,
                         instance_ids=instance_ids,
                         width=width,
                         height=height
@@ -73,11 +77,8 @@ class DIMODataset(utils.Dataset):
     def load_mask(self, image_id):
         image_info = self.image_info[image_id]
         masks = np.zeros((image_info['height'], image_info['width'], len(image_info['instance_ids'])))
-        object_count = 0
-        for file in os.listdir(image_info["masks_path"]):
-            if file.endswith(".png"):
-                masks[:, :, object_count] = skimage.io.imread(os.path.join(image_info["masks_path"], file))
-                object_count += 1
+        for object_no, mask_path in enumerate(image_info["instance_masks"]):
+            masks[:, :, object_no] = skimage.io.imread(mask_path)
         return masks.astype(np.uint8), np.array(image_info["instance_ids"], dtype=np.int32)
 
     def image_reference(self, image_id):
@@ -91,7 +92,7 @@ class DIMODataset(utils.Dataset):
         return ids
 
 
-def get_dimo_datasets(path: str, subsets: List[str]) -> Tuple[DIMODataset, DIMODataset, DimoConfig]:
+def get_dimo_datasets(path: str, subsets: List[str]) -> Tuple[DIMODataset, DIMODataset]:
     dataset_train = DIMODataset()
     dataset_train.load_dataset(path, subsets, split="train")
     dataset_train.prepare()
@@ -99,11 +100,11 @@ def get_dimo_datasets(path: str, subsets: List[str]) -> Tuple[DIMODataset, DIMOD
     dataset_val = DIMODataset()
     dataset_val.load_dataset(path, subsets, split="val")
     dataset_val.prepare()
-    return dataset_train, dataset_val, DimoConfig()
+    return dataset_train, dataset_val
 
 
-def get_test_dimo_dataset(path: str, subsets: List[str]) -> Tuple[DIMODataset, DimoInferenceConfig]:
+def get_test_dimo_dataset(path: str, subsets: List[str]) -> DIMODataset:
     dataset = DIMODataset()
     dataset.load_dataset(path, subsets, split="test")
     dataset.prepare()
-    return dataset, DimoInferenceConfig()
+    return dataset
