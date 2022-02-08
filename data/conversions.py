@@ -79,4 +79,4 @@ def convert_to_new_mask_format(path: str, subsets: List[str]) -> None:
 
 
 if __name__ == "__main__":
-    convert_to_new_mask_format("C:/Users/bvanherle/Documents/Datasets/dimo", ["sim_jaigo"])
+    convert_to_new_mask_format("D:/Datasets/dimo", ["real_jaigo_000-150", "sim_jaigo_real_light_real_pose"])

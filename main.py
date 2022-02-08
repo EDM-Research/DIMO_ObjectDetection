@@ -65,4 +65,4 @@ def test_subsets(subsets, model_id):
 
 if __name__ == "__main__":
     os.environ["DEBUG_MODE"] = "1"
-    show_subsets(["sim_jaigo"])
+    train_subsets(["sim_jaigo_real_light_real_pose"], augment=True)
