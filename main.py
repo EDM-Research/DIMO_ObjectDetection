@@ -61,4 +61,4 @@ def test_subsets(subsets, model_id):
 
 if __name__ == "__main__":
     os.environ["DEBUG_MODE"] = "1"
-    train_subsets(["real_jaigo_000-150"], "dimo20220204T1412")
+    train_subsets(["real_jaigo_000-150"])
