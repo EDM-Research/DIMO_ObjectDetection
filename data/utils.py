@@ -55,8 +55,11 @@ def create_dimo_masks(path: str, subsets: List[str], override: bool = False) -> 
             ren.add_object(model['id'], model['cad'])
 
         for scene in subset:
-            masks_path = os.path.join(scene['path'], 'masks/')
+            masks_path = os.path.join(scene['path'], 'mask_visib/')
             print(f"Processing {scene['path']}")
+
+            if get_file_count(masks_path) == sum([len(image['objects']) for image in scene['images']]):
+                continue
 
             if override:
                 create_or_empty_folder(masks_path)
@@ -65,16 +68,11 @@ def create_dimo_masks(path: str, subsets: List[str], override: bool = False) -> 
 
             for image in scene['images']:
                 camera = image['camera']
-                image_masks_path = os.path.join(masks_path, str(image['id']).zfill(6))
 
-                if get_file_count(image_masks_path) == len(image['objects']):
-                    continue
-
-                create_or_empty_folder(image_masks_path)
                 K = camera['K']
                 fx, fy, cx, cy = K[0, 0], K[1, 1], K[0, 2], K[1, 2]
 
-                dist_image = np.matrix(np.ones((dimo_data['im_height'], dimo_data['im_width'])) * np.inf)
+                dist_image = np.array(np.ones((dimo_data['im_height'], dimo_data['im_width'])) * np.inf)
                 distance_maps = []
                 for object in image['objects']:
                     depth_gt = ren.render_object(object['id'], np.array(object['cam_R_m2c']).reshape(3,3), np.array(object['cam_t_m2c']), fx, fy, cx, cy)['depth']
@@ -90,7 +88,7 @@ def create_dimo_masks(path: str, subsets: List[str], override: bool = False) -> 
                 dist_image[dist_image == np.inf] = 0
 
                 for object_no, dist_map in enumerate(distance_maps):
-                    object_mask_path = os.path.join(image_masks_path, f"{object_no}.png")
+                    object_mask_path = os.path.join(masks_path, f"{str(image['id']).zfill(6)}_{str(object_no).zfill(6)}.png")
                     mask_visib = visibility.estimate_visib_mask_gt(dist_image, dist_map, 1, visib_mode='bop19') * 255
                     inout.save_im(object_mask_path, np.array(mask_visib, dtype=np.uint8))
 
