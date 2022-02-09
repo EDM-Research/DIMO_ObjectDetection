@@ -9,8 +9,11 @@ class DimoLoader:
         result = {}
         if models_dir:
             result['models'] = self.load_models(path / models_dir)
+
+        self.class_ids = []
         for camera in cameras:
             result[camera] = self.load_scenes(path / camera)
+        result['classes'] = list(set(self.class_ids))
         return result
 
     def load_models(self, path):
@@ -49,7 +52,7 @@ class DimoLoader:
         return {
             'id': image_id,
             'path': scene_path / 'rgb' / f'{int(image_id):06d}.png',
-            'camera': self.load_camera(camera)
+            'camera': self.load_camera(camera),
             'objects': self.load_objects(scene_gt)
         }
 
@@ -64,6 +67,7 @@ class DimoLoader:
     def load_objects(self, scene_gt):
         result = []
         for o in scene_gt:
+            self.class_ids.append(int(o['obj_id']))
             result.append({
                 'id': int(o['obj_id']),
                 'model_2cam': self.load_pose(o['cam_R_m2c'], o['cam_t_m2c']),
