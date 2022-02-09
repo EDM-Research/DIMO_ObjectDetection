@@ -30,6 +30,7 @@ class DimoInferenceConfig(config.Config):
 class DIMODataset(utils.Dataset):
     def load_dataset(self, path: str, subsets: List[str], split: str = "train"):
         assert split in ["train", "val", "test"]
+        supported_extensions = ['png', 'jpg', 'jpeg']
         self.split = split
         self.subsets = subsets
 
@@ -58,7 +59,13 @@ class DIMODataset(utils.Dataset):
                     instance_ids = []
                     for i, object in enumerate(image['objects']):
                         instance_ids.append(model_to_id[str(object['id'])])
-                        instance_masks.append(os.path.join(masks_path, f"{str(image['id']).zfill(6)}_{str(i).zfill(6)}.png"))
+                        image_path = f"{str(image['id']).zfill(6)}_{str(i).zfill(6)}"
+                        for extension in supported_extensions:
+                            full_path = os.path.join(masks_path, f"{image_path}.{extension}")
+                            if os.path.exists(full_path):
+                                instance_masks.append(full_path)
+
+                    assert len(instance_masks) == len(instance_ids), "Number of masks does not match number of objects"
 
                     image_data = skimage.io.imread(image['path'])
                     height, width = image_data.shape[:2]

@@ -3,6 +3,9 @@ import os
 import numpy as np
 
 
+supported_extensions = ['png', 'jpg', 'jpeg']
+
+
 class DimoLoader:
 
     def load(self, path, models_dir='models', cameras=['real_jaigo']):
@@ -48,10 +51,18 @@ class DimoLoader:
         result['images'] = images
         return result
 
+    def get_image_path(self, scene_path, image_id):
+        for extension in supported_extensions:
+            image_path = scene_path / 'rgb' / f'{int(image_id):06d}.{extension}'
+            if os.path.exists(image_path):
+                return image_path
+        print(f"Only file types {supported_extensions} are supported")
+        exit()
+
     def load_image(self, scene_path, image_id, camera, scene_gt):
         return {
             'id': image_id,
-            'path': scene_path / 'rgb' / f'{int(image_id):06d}.png',
+            'path': self.get_image_path(scene_path, image_id),
             'camera': self.load_camera(camera),
             'objects': self.load_objects(scene_gt)
         }
