@@ -69,6 +69,7 @@ def convert_to_new_mask_format(path: str, subsets: List[str]) -> None:
             if get_file_count(new_masks_path) == sum([len(image['objects']) for image in scene['images']]):
                 continue
 
+            print(f"Converting scene {scene['id']}")
             create_or_empty_folder(new_masks_path)
 
             for image in scene['images']:

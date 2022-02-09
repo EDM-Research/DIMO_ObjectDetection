@@ -66,31 +66,59 @@ def create_dimo_masks(path: str, subsets: List[str], override: bool = False) -> 
             else:
                 create_or_ignore_folder(masks_path)
 
-            for image in scene['images']:
-                camera = image['camera']
+            render_scene_masks(scene, ren)
 
-                K = camera['K']
-                fx, fy, cx, cy = K[0, 0], K[1, 1], K[0, 2], K[1, 2]
 
-                dist_image = np.array(np.ones((dimo_data['im_height'], dimo_data['im_width'])) * np.inf)
-                distance_maps = []
-                for object in image['objects']:
-                    depth_gt = ren.render_object(object['id'], np.array(object['cam_R_m2c']).reshape(3,3), np.array(object['cam_t_m2c']), fx, fy, cx, cy)['depth']
-                    dist_gt = misc.depth_im_to_dist_im_fast(depth_gt, K)
+def render_scene_masks(scene: dict, ren: renderer):
+    masks_path = os.path.join(scene['path'], 'mask_visib/')
 
-                    # set zero depths to infinity to compute closest object for total depth map
-                    dist_gt[dist_gt == 0] = np.inf
-                    dist_image = np.minimum(dist_image, dist_gt)
+    for image in scene['images']:
+        camera = image['camera']
 
-                    dist_gt[dist_gt == np.inf] = 0
-                    distance_maps.append(dist_gt)
+        K = camera['K']
+        fx, fy, cx, cy = K[0, 0], K[1, 1], K[0, 2], K[1, 2]
 
-                dist_image[dist_image == np.inf] = 0
+        dist_image = np.array(np.ones((dimo_data['im_height'], dimo_data['im_width'])) * np.inf)
+        distance_maps = []
+        for object in image['objects']:
+            depth_gt = \
+            ren.render_object(object['id'], np.array(object['cam_R_m2c']).reshape(3, 3), np.array(object['cam_t_m2c']),
+                              fx, fy, cx, cy)['depth']
+            dist_gt = misc.depth_im_to_dist_im_fast(depth_gt, K)
 
-                for object_no, dist_map in enumerate(distance_maps):
-                    object_mask_path = os.path.join(masks_path, f"{str(image['id']).zfill(6)}_{str(object_no).zfill(6)}.png")
-                    mask_visib = visibility.estimate_visib_mask_gt(dist_image, dist_map, 1, visib_mode='bop19') * 255
-                    inout.save_im(object_mask_path, np.array(mask_visib, dtype=np.uint8))
+            # set zero depths to infinity to compute closest object for total depth map
+            dist_gt[dist_gt == 0] = np.inf
+            dist_image = np.minimum(dist_image, dist_gt)
+
+            dist_gt[dist_gt == np.inf] = 0
+            distance_maps.append(dist_gt)
+
+        dist_image[dist_image == np.inf] = 0
+
+        for object_no, dist_map in enumerate(distance_maps):
+            object_mask_path = os.path.join(masks_path, f"{str(image['id']).zfill(6)}_{str(object_no).zfill(6)}.png")
+            mask_visib = visibility.estimate_visib_mask_gt(dist_image, dist_map, 1, visib_mode='bop19') * 255
+            inout.save_im(object_mask_path, np.array(mask_visib, dtype=np.uint8))
+
+
+def create_dimo_scene_masks(path: str, subset: str, scene_id: int) -> None:
+    dimo_loader = DimoLoader()
+    dimo_ds = dimo_loader.load(Path(path), cameras=[subset])
+
+    subset = dimo_ds[subset]
+    models = dimo_ds['models']
+
+    ren = renderer.create_renderer(dimo_data['im_width'], dimo_data['im_height'], renderer_type='vispy', mode='depth')
+    for model in models:
+        ren.add_object(model['id'], model['cad'])
+
+    for scene in subset:
+        if scene['id'] == scene_id:
+            masks_path = os.path.join(scene['path'], 'mask_visib/')
+
+            print(f"Processing {scene['path']}")
+            create_or_empty_folder(masks_path)
+            render_scene_masks(scene, ren)
 
 
 def create_dimo_train_split(path: str, subsets: List[str], train: float = 0.9, val: float = 0.05, test: float = 0.05, seed: int = None) -> None:
@@ -133,3 +161,6 @@ def create_dimo_train_split(path: str, subsets: List[str], train: float = 0.9, v
         write_to_file(os.path.join(subset_path, "train.txt"), train_ids)
         write_to_file(os.path.join(subset_path, "val.txt"), val_ids)
         write_to_file(os.path.join(subset_path, "test.txt"), test_ids)
+
+if __name__ == "__main__":
+    create_dimo_scene_masks("D:/Datasets/DIMO/dimo", "sim_jaigo_rand_light_rand_pose", 3649)
