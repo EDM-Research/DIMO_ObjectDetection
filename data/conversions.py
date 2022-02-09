@@ -4,7 +4,7 @@ from typing import List, Tuple
 import numpy as np
 from data.dimo_loader import DimoLoader
 from pathlib import Path
-from data.utils import create_or_empty_folder
+from data.utils import create_or_empty_folder, get_file_count
 import shutil
 
 
@@ -66,6 +66,9 @@ def convert_to_new_mask_format(path: str, subsets: List[str]) -> None:
             old_masks_path = os.path.join(scene['path'], 'masks/')
             new_masks_path = os.path.join(scene['path'], 'mask_visib/')
 
+            if get_file_count(new_masks_path) == sum([len(image['objects']) for image in scene['images']]):
+                continue
+
             create_or_empty_folder(new_masks_path)
 
             for image in scene['images']:
@@ -79,4 +82,9 @@ def convert_to_new_mask_format(path: str, subsets: List[str]) -> None:
 
 
 if __name__ == "__main__":
-    convert_to_new_mask_format("D:/Datasets/dimo", ["real_jaigo_000-150", "sim_jaigo_real_light_real_pose"])
+    convert_to_new_mask_format("D:/Datasets/DIMO/dimo", ["real_jaigo_000-150",
+                                                    "sim_jaigo_real_light_real_pose",
+                                                    "sim_jaigo_real_light_rand_pose",
+                                                    "sim_jaigo_rand_light_real_pose",
+                                                    "sim_jaigo_rand_light_rand_pose"]
+                               )
