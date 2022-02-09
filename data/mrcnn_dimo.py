@@ -34,15 +34,15 @@ class DIMODataset(utils.Dataset):
         self.subsets = subsets
 
         dimo_loader = DimoLoader()
-        dimo_ds = dimo_loader.load(Path(path), cameras=subsets)
+        dimo_ds = dimo_loader.load(Path(path), cameras=subsets, models_dir=None)
         image_no = 0
         debug = os.environ.get("DEBUG_MODE", "0") == "1"
 
         model_to_id = {}
 
-        for i, model in enumerate(dimo_ds['models']):
-            self.add_class("dimo", i + 1, str(model['id']))
-            model_to_id[str(model['id'])] = i + 1
+        for i, model in enumerate(dimo_ds['classes']):
+            self.add_class("dimo", i + 1, str(model))
+            model_to_id[str(model)] = i + 1
 
         for subset_name in subsets:
             subset = dimo_ds[subset_name]
