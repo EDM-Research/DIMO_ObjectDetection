@@ -18,3 +18,4 @@ scikit-image==0.16.2
 scipy==1.4.1
 tensorflow==2.5.0
 vispy==0.9.4
+IPython
