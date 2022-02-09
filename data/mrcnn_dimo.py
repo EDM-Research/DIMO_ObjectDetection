@@ -93,7 +93,7 @@ class DIMODataset(utils.Dataset):
         return ids
 
 
-def get_dimo_datasets(path: str, subsets: List[str]) -> Tuple[DIMODataset, DIMODataset]:
+def get_dimo_datasets(path: str, subsets: List[str]) -> Tuple[DIMODataset, DIMODataset, DimoConfig]:
     dataset_train = DIMODataset()
     dataset_train.load_dataset(path, subsets, split="train")
     dataset_train.prepare()
@@ -101,11 +101,19 @@ def get_dimo_datasets(path: str, subsets: List[str]) -> Tuple[DIMODataset, DIMOD
     dataset_val = DIMODataset()
     dataset_val.load_dataset(path, subsets, split="val")
     dataset_val.prepare()
-    return dataset_train, dataset_val
+
+    config = DimoConfig()
+    config.NUM_CLASSES = len(dataset_train.class_ids)
+
+    return dataset_train, dataset_val, config
 
 
-def get_test_dimo_dataset(path: str, subsets: List[str]) -> DIMODataset:
+def get_test_dimo_dataset(path: str, subsets: List[str]) -> Tuple[DIMODataset, DimoInferenceConfig]:
     dataset = DIMODataset()
     dataset.load_dataset(path, subsets, split="test")
     dataset.prepare()
-    return dataset
+
+    config = DimoInferenceConfig()
+    config.NUM_CLASSES = len(dataset.class_ids)
+
+    return dataset, config
