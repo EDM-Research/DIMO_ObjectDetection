@@ -64,6 +64,7 @@ class DIMODataset(utils.Dataset):
                             full_path = os.path.join(masks_path, f"{image_path}.{extension}")
                             if os.path.exists(full_path):
                                 instance_masks.append(full_path)
+                                break
 
                     assert len(instance_masks) == len(instance_ids), "Number of masks does not match number of objects"
 
