@@ -1,17 +1,14 @@
 import json
 import os
-
-from pathlib import Path
-
 import numpy as np
-from scipy.spatial.transform import Rotation
 
 
 class DimoLoader:
 
     def load(self, path, models_dir='models', cameras=['real_jaigo']):
         result = {}
-        result['models'] = self.load_models(path / models_dir)
+        if models_dir:
+            result['models'] = self.load_models(path / models_dir)
         for camera in cameras:
             result[camera] = self.load_scenes(path / camera)
         return result
@@ -38,28 +35,22 @@ class DimoLoader:
         }
         images = []
         with open(path / 'scene_camera.json') as f_scene_camera, \
-                open(path / 'scene_gt.json') as f_scene_gt, \
-                open(path / 'scene_gt_world.json') as f_scene_gt_world, \
-                open(path / 'scene_info.json') as f_scene_info:
+                open(path / 'scene_gt.json') as f_scene_gt:
             scene_camera = json.load(f_scene_camera)
             scene_gt = json.load(f_scene_gt)
-            scene_gt_world = json.load(f_scene_gt_world)
-            scene_info = json.load(f_scene_info)
             assert scene_camera.keys() == scene_gt.keys(), "labels are not consistent for all images"
             for image_id in scene_camera.keys():
                 images.append(
-                    self.load_image(path, int(image_id), scene_camera[image_id], scene_gt[image_id], scene_gt_world,
-                                    scene_info[image_id]))
+                    self.load_image(path, int(image_id), scene_camera[image_id], scene_gt[image_id]))
         result['images'] = images
         return result
 
-    def load_image(self, scene_path, image_id, camera, scene_gt, scene_gt_world, scene_info):
+    def load_image(self, scene_path, image_id, camera, scene_gt):
         return {
             'id': image_id,
             'path': scene_path / 'rgb' / f'{int(image_id):06d}.png',
-            'camera': self.load_camera(camera),
-            'scene_info': scene_info,
-            'objects': self.load_objects(scene_gt, scene_gt_world)
+            'camera': self.load_camera(camera)
+            'objects': self.load_objects(scene_gt)
         }
 
     def load_camera(self, camera):
@@ -70,16 +61,14 @@ class DimoLoader:
             'cam_2world': T
         }
 
-    def load_objects(self, scene_gt, scene_gt_world):
+    def load_objects(self, scene_gt):
         result = []
-        for o, o_world in zip(scene_gt, scene_gt_world):
-            #assert o['obj_id'] == o_world['obj_id']
+        for o in scene_gt:
             result.append({
                 'id': int(o['obj_id']),
                 'model_2cam': self.load_pose(o['cam_R_m2c'], o['cam_t_m2c']),
                 'cam_R_m2c': o['cam_R_m2c'],
                 'cam_t_m2c': o['cam_t_m2c']
-                #'model_2world': self.load_pose(o_world['cam_R_m2w'], o_world['cam_t_m2w'])
             })
         return result
 
