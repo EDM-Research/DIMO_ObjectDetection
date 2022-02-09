@@ -146,7 +146,7 @@ def create_dimo_train_split(path: str, subsets: List[str], train: float = 0.9, v
     val /= sum([train, val, test])
 
     dimo_loader = DimoLoader()
-    dimo_ds = dimo_loader.load(Path(path), cameras=subsets)
+    dimo_ds = dimo_loader.load(Path(path), cameras=subsets, models_dir=None)
 
     for subset_name in subsets:
         subset = dimo_ds[subset_name]
