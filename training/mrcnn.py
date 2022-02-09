@@ -5,12 +5,28 @@ import os
 COCO_WEIGHTS_PATH = 'weights/mask_rcnn_coco.h5'
 
 
-def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Config, use_coco_weights: bool = True, augment: bool = True, checkpoint_model: modellib.MaskRCNN = None):
+def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Config, use_coco_weights: bool = True, augment: bool = True, checkpoint_model: modellib.MaskRCNN = None, use_wandb: bool = False):
     augmenters = augmentation.augmenters if augment else None
     if checkpoint_model:
         model = checkpoint_model
     else:
         model = modellib.MaskRCNN(mode="training", config=config, model_dir='models')
+
+    custom_callbacks = []
+
+    if use_wandb:
+        import wandb
+        from wandb.keras import WandbCallback
+        wandb_config = {
+            'subsets': train_set.subsets,
+            'model_id': model.log_dir.split("/")[-1],
+            'learning_rate': config.LEARNING_RATE,
+            'steps_per_epoch': config.STEPS_PER_EPOCH,
+            'images_per_GPU': config.IMAGES_PER_GPU,
+            'training_images': len(train_set.image_ids)
+        }
+        wandb.init(project="dimo-object-detection", entity="bvanherle", config=wandb_config)
+        custom_callbacks.append(WandbCallback())
 
     print(f"Saving model to {model.log_dir}\n")
     print(f"\nAugmentation: {augment}\t Transfer Learning: {use_coco_weights}\n")
@@ -25,4 +41,5 @@ def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Confi
                 learning_rate=config.LEARNING_RATE,
                 epochs=100,
                 layers='heads' if use_coco_weights else 'all',
-                augmentation=augmenters)
+                augmentation=augmenters,
+                custom_callbacks=custom_callbacks)

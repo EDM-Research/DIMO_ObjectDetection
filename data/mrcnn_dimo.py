@@ -31,6 +31,7 @@ class DIMODataset(utils.Dataset):
     def load_dataset(self, path: str, subsets: List[str], split: str = "train"):
         assert split in ["train", "val", "test"]
         self.split = split
+        self.subsets = subsets
 
         dimo_loader = DimoLoader()
         dimo_ds = dimo_loader.load(Path(path), cameras=subsets)
