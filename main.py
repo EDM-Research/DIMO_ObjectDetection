@@ -29,9 +29,9 @@ def train_subsets(subsets, model_id=None, augment: bool = False, transfer_learni
     mrcnn.train(train, val, config, augment=augment, use_coco_weights=transfer_learning, checkpoint_model=model)
 
 
-def prepare_subsets(subsets, override: bool = False):
+def prepare_subsets(subsets, override: bool = False, split_scenes: bool = False):
     data_utils.create_dimo_masks(DIMO_PATH, subsets, override=override)
-    data_utils.create_dimo_train_split(DIMO_PATH, subsets, seed=10)
+    data_utils.create_dimo_train_split(DIMO_PATH, subsets, seed=10, split_scenes=split_scenes)
 
 
 def show_subsets(subsets):

@@ -121,18 +121,39 @@ def create_dimo_scene_masks(path: str, subset: str, scene_id: int) -> None:
             render_scene_masks(scene, ren)
 
 
-def create_dimo_train_split(path: str, subsets: List[str], train: float = 0.9, val: float = 0.05, test: float = 0.05, seed: int = None) -> None:
+def create_dimo_train_split(path: str, subsets: List[str], train: float = 0.9, val: float = 0.05, test: float = 0.05, seed: int = None, split_scenes: bool = False) -> None:
     """
     Given the path to a dimo dataset, this function will split the scenes of the given subsets in training, validation
     and testing dataset. The function creates files of name {split}.txt
-    :param path:    path to the dimo dataset
-    :param subsets: subsets to generate split for
-    :param train:   portion of scenes to be training dataset
-    :param val:     portion of scenes to be validation dataset
-    :param test:    portion of scenes to be test dataset
-    :param seed:    optionally set random seed
+    :param path:        path to the dimo dataset
+    :param subsets:     subsets to generate split for
+    :param train:       portion of scenes to be training dataset
+    :param val:         portion of scenes to be validation dataset
+    :param test:        portion of scenes to be test dataset
+    :param seed:        optionally set random seed
+    :param split_scenes:if set to true the split are based on the scenes, otherwise on the images
     :return:
     """
+    def get_scenes_split(subset: list) -> Tuple[List[str], List[str], List[str]]:
+        scenes = subset
+        random.shuffle(scenes)
+
+        train_ids = [f"{scene['id']}_{image['id']}" for scene in scenes[:int(train * len(scenes))] for image in scene['images']]
+        val_ids = [f"{scene['id']}_{image['id']}" for scene in scenes[int(train * len(scenes)):int((val + train) * len(scenes))] for image in scene['images']]
+        test_ids = [f"{scene['id']}_{image['id']}" for scene in scenes[int((val + train) * len(scenes)):] for image in scene['images']]
+
+        return train_ids, val_ids, test_ids
+
+    def get_images_split(subset: list) -> Tuple[List[str], List[str], List[str]]:
+        image_ids = [f"{scene['id']}_{image['id']}" for scene in subset for image in scene['images']]
+        random.shuffle(image_ids)
+
+        train_ids = image_ids[:int(train * len(image_ids))]
+        val_ids = image_ids[int(train * len(image_ids)):int((val + train) * len(image_ids))]
+        test_ids = image_ids[int((val + train) * len(image_ids)):]
+
+        return train_ids, val_ids, test_ids
+
     def write_to_file(file: str, data: list):
         with open(file, 'w') as f:
             for element in data:
@@ -150,17 +171,14 @@ def create_dimo_train_split(path: str, subsets: List[str], train: float = 0.9, v
 
     for subset_name in subsets:
         subset = dimo_ds[subset_name]
-        scene_ids = [scene['id'] for scene in subset]
-        random.shuffle(scene_ids)
 
-        train_ids = scene_ids[:int(train * len(scene_ids))]
-        val_ids = scene_ids[int(train * len(scene_ids)):int((val + train) * len(scene_ids))]
-        test_ids = scene_ids[int((val + train) * len(scene_ids)):]
+        train_ids, val_ids, test_ids = get_scenes_split(subset) if split_scenes else get_images_split(subset)
 
         subset_path = os.path.join(path, f"{subset_name}/")
         write_to_file(os.path.join(subset_path, "train.txt"), train_ids)
         write_to_file(os.path.join(subset_path, "val.txt"), val_ids)
         write_to_file(os.path.join(subset_path, "test.txt"), test_ids)
+
 
 if __name__ == "__main__":
     create_dimo_scene_masks("D:/Datasets/DIMO/dimo", "sim_jaigo_rand_light_rand_pose", 3649)

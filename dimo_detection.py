@@ -9,13 +9,15 @@ parser.add_argument('--model', type=str, default=None)
 parser.add_argument('-o', action='store_true')
 parser.add_argument('-a', action='store_true')
 parser.add_argument('-t', action='store_true')
+parser.add_argument('-s', action='store_true')
 args = parser.parse_args()
 
 action = args.action
 
 if action == 'prepare':
     override = args.o
-    prepare_subsets(args.subsets, override)
+    split_scenes = args.s
+    prepare_subsets(args.subsets, override, split_scenes)
 elif action == 'show':
     show_subsets(args.subsets)
 elif action == 'train':

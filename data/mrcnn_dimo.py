@@ -46,12 +46,14 @@ class DIMODataset(utils.Dataset):
 
         for subset_name in subsets:
             subset = dimo_ds[subset_name]
-            scene_ids = self.get_scene_ids(path, subset_name)
+            image_ids = self.get_image_ids(path, subset_name)
             for scene in subset:
-                if scene['id'] not in scene_ids:
-                    continue
+
                 masks_path = os.path.join(scene['path'], 'mask_visib/')
                 for image in scene['images']:
+                    if f"{scene['id']}_{image['id']}" not in image_ids:
+                        continue
+
                     instance_masks = []
                     instance_ids = []
                     for i, object in enumerate(image['objects']):
@@ -85,11 +87,11 @@ class DIMODataset(utils.Dataset):
     def image_reference(self, image_id):
         return self.image_info[image_id]['path']
 
-    def get_scene_ids(self, path: str, subset: str) -> List[int]:
+    def get_image_ids(self, path: str, subset: str) -> List[str]:
         subset_path = os.path.join(path, subset)
         split_file_path = os.path.join(subset_path, f"{self.split}.txt")
         with open(split_file_path, 'r') as f:
-            ids = [int(line.rstrip()) for line in f]
+            ids = [line.rstrip() for line in f]
         return ids
 
 
