@@ -132,6 +132,7 @@ dmypy.json
 bop_toolkit/
 Mask_RCNN/
 mrcnn/
+wandb/
 
 # PyCharm
 .idea/
