@@ -1,11 +1,22 @@
 from mrcnn import config, utils, model as modellib
 from training import augmentation
 import os
+import configparser
 
 COCO_WEIGHTS_PATH = 'weights/mask_rcnn_coco.h5'
 
 
-def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Config, use_coco_weights: bool = True, augment: bool = True, checkpoint_model: modellib.MaskRCNN = None, use_wandb: bool = False):
+def get_wandb_info():
+    user_config = configparser.ConfigParser()
+    user_config.read('config.ini')
+
+    if 'wandb' not in user_config['USER_SETTINGS'].keys() or not bool(user_config['USER_SETTINGS']['wandb']):
+        return None
+    else:
+        return user_config['USER_SETTINGS']['wandb_project'], user_config['USER_SETTINGS']['wandb_entity']
+
+
+def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Config, use_coco_weights: bool = True, augment: bool = True, checkpoint_model: modellib.MaskRCNN = None):
     augmenters = augmentation.augmenters if augment else None
     if checkpoint_model:
         model = checkpoint_model
@@ -14,7 +25,8 @@ def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Confi
 
     custom_callbacks = []
 
-    if use_wandb:
+    wandb_info = get_wandb_info()
+    if wandb_info:
         import wandb
         from wandb.keras import WandbCallback
         wandb_config = {
@@ -25,7 +37,7 @@ def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Confi
             'images_per_GPU': config.IMAGES_PER_GPU,
             'training_images': len(train_set.image_ids)
         }
-        wandb.init(project="dimo-object-detection", entity="bvanherle", config=wandb_config)
+        wandb.init(project=wandb_info[0], entity=wandb_info[1], config=wandb_config)
         custom_callbacks.append(WandbCallback())
 
     print(f"Saving model to {model.log_dir}\n")
