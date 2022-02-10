@@ -13,18 +13,24 @@ class DimoConfig(config.Config):
     NAME = "dimo"
     IMAGES_PER_GPU = 2
     USE_MINI_MASK = True
-    NUM_CLASSES = 8 + 1     # 8 models + background
     STEPS_PER_EPOCH = 1000
     TRAIN_ROIS_PER_IMAGE = 50
     LEARNING_RATE = 0.001
+
+    def __init__(self, num_classes):
+        self.NUM_CLASSES = num_classes
+        super().__init__()
 
 
 class DimoInferenceConfig(config.Config):
     NAME = "dimo"
     IMAGES_PER_GPU = 1
-    NUM_CLASSES = 8 + 1     # 8 models + background
     DETECTION_MIN_CONFIDENCE = 0.5
     USE_MINI_MASK = False
+
+    def __init__(self, num_classes):
+        self.NUM_CLASSES = num_classes
+        super().__init__()
 
 
 class DIMODataset(utils.Dataset):
@@ -125,8 +131,7 @@ def get_dimo_datasets(path: str, subsets: List[str]) -> Tuple[DIMODataset, DIMOD
     dataset_val.load_dataset(path, subsets, split="val")
     dataset_val.prepare()
 
-    config = DimoConfig()
-    config.NUM_CLASSES = len(dataset_train.class_ids)
+    config = DimoConfig(len(dataset_train.class_ids))
 
     return dataset_train, dataset_val, config
 
@@ -136,7 +141,6 @@ def get_test_dimo_dataset(path: str, subsets: List[str]) -> Tuple[DIMODataset, D
     dataset.load_dataset(path, subsets, split="test")
     dataset.prepare()
 
-    config = DimoInferenceConfig()
-    config.NUM_CLASSES = len(dataset.class_ids)
+    config = DimoInferenceConfig(len(dataset.class_ids))
 
     return dataset, config

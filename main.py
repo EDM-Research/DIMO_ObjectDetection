@@ -30,7 +30,7 @@ def train_subsets(subsets, model_id=None, augment: bool = False, transfer_learni
 
 
 def prepare_subsets(subsets, override: bool = False, split_scenes: bool = False):
-    #data_utils.create_dimo_masks(DIMO_PATH, subsets, override=override)
+    data_utils.create_dimo_masks(DIMO_PATH, subsets, override=override)
     data_utils.create_dimo_train_split(DIMO_PATH, subsets, seed=10, split_scenes=split_scenes)
 
 
@@ -64,4 +64,4 @@ def test_subsets(subsets, model_id):
 
 if __name__ == "__main__":
     os.environ["DEBUG_MODE"] = "0"
-    show_subsets(["train_PBR"])
+    train_subsets(["train_PBR"])
