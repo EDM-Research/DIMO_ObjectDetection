@@ -76,17 +76,12 @@ class DIMODataset(utils.Dataset):
 
                     assert len(instance_masks) == len(instance_ids), "Number of masks does not match number of objects"
 
-                    image_data = skimage.io.imread(image['path'])
-                    height, width = image_data.shape[:2]
-
                     self.add_image(
                         "dimo",
                         image_id=f"{subset_name}_{scene['id']}_{image['id']}",
                         path=image['path'],
                         instance_masks=instance_masks,
-                        instance_ids=instance_ids,
-                        width=width,
-                        height=height
+                        instance_ids=instance_ids
                     )
                     image_no += 1
 
@@ -100,11 +95,13 @@ class DIMODataset(utils.Dataset):
                 return full_path
         return None
 
-
     def load_mask(self, image_id):
         image_info = self.image_info[image_id]
-        masks = np.zeros((image_info['height'], image_info['width'], len(image_info['instance_ids'])))
-        for object_no, mask_path in enumerate(image_info["instance_masks"]):
+        mask_0 = skimage.io.imread(image_info["instance_masks"][0])
+        masks = np.zeros((mask_0.shape[0], mask_0.shape[1], len(image_info['instance_ids'])))
+        masks[:, :, 0] = mask_0
+
+        for object_no, mask_path in enumerate(image_info["instance_masks"][1:]):
             masks[:, :, object_no] = skimage.io.imread(mask_path)
         return masks.astype(np.uint8), np.array(image_info["instance_ids"], dtype=np.int32)
 
