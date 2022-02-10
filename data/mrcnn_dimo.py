@@ -102,7 +102,7 @@ class DIMODataset(utils.Dataset):
         masks[:, :, 0] = mask_0
 
         for object_no, mask_path in enumerate(image_info["instance_masks"][1:]):
-            masks[:, :, object_no] = skimage.io.imread(mask_path)
+            masks[:, :, object_no+1] = skimage.io.imread(mask_path)
         return masks.astype(np.uint8), np.array(image_info["instance_ids"], dtype=np.int32)
 
     def image_reference(self, image_id):
