@@ -64,4 +64,4 @@ def test_subsets(subsets, model_id):
 
 if __name__ == "__main__":
     os.environ["DEBUG_MODE"] = "0"
-    train_subsets(["train_PBR"])
+    train_subsets(["train_PBR"], transfer_learning=True)

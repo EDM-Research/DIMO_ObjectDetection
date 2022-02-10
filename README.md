@@ -27,6 +27,7 @@ Create a file named `config.ini` with the following contents:
 ```
 [USER_SETTINGS]
 dimo_path = **dimo path**
+images_per_gpu = 1 **increase this depending on GPU memory**
 ```
 Download the [DIMO dataset](https://github.com/pderoovere/dimo) base and the desired subsets.
 Set the `DIMO_PATH` in `config.ini` to the download location.

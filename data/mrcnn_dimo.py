@@ -1,5 +1,4 @@
-import random
-
+import configparser
 from mrcnn import utils, visualize, config
 from data.dimo_loader import DimoLoader
 from pathlib import Path
@@ -11,14 +10,19 @@ import skimage
 
 class DimoConfig(config.Config):
     NAME = "dimo"
-    IMAGES_PER_GPU = 2
+    IMAGES_PER_GPU = 4
     USE_MINI_MASK = True
     STEPS_PER_EPOCH = 1000
     TRAIN_ROIS_PER_IMAGE = 50
     LEARNING_RATE = 0.001
+    NUM_CLASSES = 8 + 1
 
     def __init__(self, num_classes):
         self.NUM_CLASSES = num_classes
+        user_config = configparser.ConfigParser()
+        user_config.read('config.ini')
+        if 'images_per_gpu' in user_config['USER_SETTINGS'].keys():
+            self.IMAGES_PER_GPU = user_config['USER_SETTINGS']['images_per_gpu']
         super().__init__()
 
 
