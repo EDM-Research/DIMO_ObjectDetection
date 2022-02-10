@@ -22,7 +22,7 @@ class DimoConfig(config.Config):
         user_config = configparser.ConfigParser()
         user_config.read('config.ini')
         if 'images_per_gpu' in user_config['USER_SETTINGS'].keys():
-            self.IMAGES_PER_GPU = user_config['USER_SETTINGS']['images_per_gpu']
+            self.IMAGES_PER_GPU = int(user_config['USER_SETTINGS']['images_per_gpu'])
         super().__init__()
 
 
