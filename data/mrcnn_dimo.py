@@ -57,14 +57,22 @@ class DIMODataset(utils.Dataset):
 
                     instance_masks = []
                     instance_ids = []
+
+                    one_indexed = True
                     for i, object in enumerate(image['objects']):
                         instance_ids.append(model_to_id[str(object['id'])])
-                        image_path = f"{str(image['id']).zfill(6)}_{str(i).zfill(6)}"
-                        for extension in supported_extensions:
-                            full_path = os.path.join(masks_path, f"{image_path}.{extension}")
-                            if os.path.exists(full_path):
-                                instance_masks.append(full_path)
-                                break
+                        image_path = os.path.join(masks_path, f"{str(image['id']).zfill(6)}_{str(i).zfill(6)}")
+                        mask_path = self.find_file(image_path, supported_extensions)
+                        if mask_path is not None:
+                            instance_masks.append(mask_path)
+                        elif i == 0:
+                            one_indexed = True
+
+                    if one_indexed:
+                        image_path = os.path.join(masks_path, f"{str(image['id']).zfill(6)}_{str(len(image['objects'])).zfill(6)}")
+                        mask_path = self.find_file(image_path, supported_extensions)
+                        if mask_path is not None:
+                            instance_masks.append(mask_path)
 
                     assert len(instance_masks) == len(instance_ids), "Number of masks does not match number of objects"
 
@@ -84,6 +92,14 @@ class DIMODataset(utils.Dataset):
 
                     if debug and image_no > 20:
                         return
+
+    def find_file(self, path: str, extensions: list):
+        for extension in extensions:
+            full_path = f"{path}.{extension}"
+            if os.path.exists(full_path):
+                return full_path
+        return None
+
 
     def load_mask(self, image_id):
         image_info = self.image_info[image_id]
