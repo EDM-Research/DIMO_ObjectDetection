@@ -29,7 +29,7 @@ class DimoConfig(config.Config):
 class DimoInferenceConfig(config.Config):
     NAME = "dimo"
     IMAGES_PER_GPU = 1
-    DETECTION_MIN_CONFIDENCE = 0.5
+    DETECTION_MIN_CONFIDENCE = 0.9
     USE_MINI_MASK = False
 
     def __init__(self, num_classes):

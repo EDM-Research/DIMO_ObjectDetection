@@ -1,5 +1,4 @@
-import cv2.cv2
-
+import skimage
 import data.mrcnn_dimo
 from data import utils as data_utils
 from data import mrcnn_dimo
@@ -30,7 +29,7 @@ def train_subsets(subsets, model_id=None, augment: bool = False, transfer_learni
 
 
 def prepare_subsets(subsets, override: bool = False, split_scenes: bool = False):
-    #data_utils.create_dimo_masks(DIMO_PATH, subsets, override=override)
+    data_utils.create_dimo_masks(DIMO_PATH, subsets, override=override)
     data_utils.create_dimo_train_split(DIMO_PATH, subsets, seed=10, split_scenes=split_scenes)
 
 
@@ -62,11 +61,23 @@ def test_subsets(subsets, model_id):
     evaluation.show_results(results, dataset, config)
 
 
+def test_folder(folder,  model_id, num_classes):
+    config = data.mrcnn_dimo.DimoInferenceConfig(num_classes=num_classes)
+    model = evaluation.load_model(model_id, config)
+
+    for file in os.listdir(folder):
+        if file.endswith(".jpg") or file.endswith(".png") or file.endswith(".jpeg"):
+            image = skimage.io.imread(os.path.join(folder, file))
+            result = model.detect([image])[0]
+            visualize.display_instances(
+                image=image,
+                boxes=result['rois'],
+                masks=result['masks'],
+                class_ids=result['class_ids'],
+                class_names= [str(i) for i in range(num_classes)],
+                scores=result['scores']
+            )
+
+
 if __name__ == "__main__":
-    os.environ["DEBUG_MODE"] = "0"
-    prepare_subsets([
-        "real_jaigo_000-150",
-        "sim_jaigo_rand_light_real_pose",
-        "sim_jaigo_real_light_rand_pose",
-        "sim_jaigo_real_light_real_pose"
-    ])
+    test_folder("C:/Users/bvanherle/Documents/Datasets/deo/real_jpg", "deo_001", 5)
