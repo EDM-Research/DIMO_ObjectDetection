@@ -3,11 +3,16 @@ import data.mrcnn_dimo
 from data import utils as data_utils
 from data import mrcnn_dimo
 import os, random
-from mrcnn import utils, visualize
+from mrcnn import utils as mrcnn_utils
+from mrcnn import visualize as mrcnn_visualise
 from mrcnn import model as modellib
 from training import evaluation
+from utils import visualize
 import configparser
-import matplotlib.pyplot as plt
+import cv2
+import numpy as np
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -45,7 +50,7 @@ def show_subsets(subsets):
         image_info = dataset_train.image_info[image_id]
         image, image_meta, gt_class_id, gt_bbox, gt_mask = modellib.load_image_gt(dataset_train, config, image_id)
         # Compute Bounding box
-        visualize.display_instances(image, gt_bbox, gt_mask, gt_class_id, dataset_train.class_names, title=image_info['id'])
+        mrcnn_visualise.display_instances(image, gt_bbox, gt_mask, gt_class_id, dataset_train.class_names, title=image_info['id'])
 
 
 def test_subsets(subsets, model_id):
@@ -61,23 +66,28 @@ def test_subsets(subsets, model_id):
     evaluation.show_results(results, dataset, config)
 
 
-def test_folder(folder,  model_id, num_classes):
+def test_folder(folder,  model_id, num_classes, select_roi=False, save_folder=None):
     config = data.mrcnn_dimo.DimoInferenceConfig(num_classes=num_classes)
     model = evaluation.load_model(model_id, config)
 
     for file in os.listdir(folder):
         if file.endswith(".jpg") or file.endswith(".png") or file.endswith(".jpeg"):
-            image = skimage.io.imread(os.path.join(folder, file))
-            result = model.detect([image])[0]
-            visualize.display_instances(
-                image=image,
+            image = cv2.imread(os.path.join(folder, file))
+            image_small = cv2.resize(image, (int(image.shape[1]/4), int(image.shape[0]/4)))
+            r = cv2.selectROI(image_small)
+            crop = image[int(r[1]*4):int((r[1] + r[3])*4), int(r[0]*4):int((r[0] + r[2])*4)]
+            input_image = cv2.cvtColor(crop, cv2.COLOR_BGR2RGB)
+            result = model.detect([input_image])[0]
+
+            image = visualize.render_instances(
+                image=input_image,
                 boxes=result['rois'],
                 masks=result['masks'],
                 class_ids=result['class_ids'],
-                class_names= [str(i) for i in range(num_classes)],
+                class_names=[str(i) for i in range(num_classes)],
                 scores=result['scores']
             )
 
 
 if __name__ == "__main__":
-    test_folder("C:/Users/bvanherle/Documents/Datasets/deo/real_jpg", "deo_001", 5)
+    test_folder("C:/Users/bvanherle/Documents/Datasets/deo/real_jpg", "deo_002", 5)
