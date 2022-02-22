@@ -7,7 +7,7 @@ from mrcnn import utils as mrcnn_utils
 from mrcnn import visualize as mrcnn_visualise
 from mrcnn import model as modellib
 from training import evaluation
-from utils import visualize
+from utils import visualize, interactions
 import configparser
 import cv2
 import numpy as np
@@ -70,24 +70,32 @@ def test_folder(folder,  model_id, num_classes, select_roi=False, save_folder=No
     config = data.mrcnn_dimo.DimoInferenceConfig(num_classes=num_classes)
     model = evaluation.load_model(model_id, config)
 
-    for file in os.listdir(folder):
-        if file.endswith(".jpg") or file.endswith(".png") or file.endswith(".jpeg"):
-            image = cv2.imread(os.path.join(folder, file))
-            image_small = cv2.resize(image, (int(image.shape[1]/4), int(image.shape[0]/4)))
-            r = cv2.selectROI(image_small)
-            crop = image[int(r[1]*4):int((r[1] + r[3])*4), int(r[0]*4):int((r[0] + r[2])*4)]
-            input_image = cv2.cvtColor(crop, cv2.COLOR_BGR2RGB)
-            result = model.detect([input_image])[0]
+    images = [cv2.imread(os.path.join(folder, file)) for file in os.listdir(folder) if file.endswith(".jpg") or file.endswith(".png") or file.endswith(".jpeg")]
 
-            image = visualize.render_instances(
-                image=input_image,
-                boxes=result['rois'],
-                masks=result['masks'],
-                class_ids=result['class_ids'],
-                class_names=[str(i) for i in range(num_classes)],
-                scores=result['scores']
-            )
+    rois = interactions.select_rois(images) if select_roi else None
+
+    for i, image in enumerate(images):
+        input_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        if rois:
+            r = rois[i]
+            input_image = input_image[r[0]:r[1], r[2]: r[3]]
+        result = model.detect([input_image])[0]
+
+        plot = visualize.render_instances(
+            image=input_image,
+            boxes=result['rois'],
+            masks=result['masks'],
+            class_ids=result['class_ids'],
+            class_names=[str(i) for i in range(num_classes)],
+            scores=result['scores']
+        )
+
+        if save_folder:
+            cv2.imwrite(os.path.join(save_folder, f"{i}.png"), plot)
+        else:
+            cv2.imshow("Result", plot)
+            cv2.waitKey(0)
 
 
 if __name__ == "__main__":
-    test_folder("C:/Users/bvanherle/Documents/Datasets/deo/real_jpg", "deo_002", 5)
+    test_folder("C:/Users/bvanherle/Documents/Datasets/deo/fase_1", "deo_002", 5, select_roi=True)
