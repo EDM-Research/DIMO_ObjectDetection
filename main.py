@@ -20,7 +20,7 @@ config.read('config.ini')
 DIMO_PATH = config['USER_SETTINGS']['dimo_path']
 
 
-def train_subsets(subsets, model_id=None, augment: bool = False, transfer_learning: bool = False):
+def train_subsets(subsets: list, model_id: str=None, augment: bool = False, transfer_learning: bool = False):
     from training import mrcnn
 
     train, val, config = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets)
@@ -33,12 +33,12 @@ def train_subsets(subsets, model_id=None, augment: bool = False, transfer_learni
     mrcnn.train(train, val, config, augment=augment, use_coco_weights=transfer_learning, checkpoint_model=model)
 
 
-def prepare_subsets(subsets, override: bool = False, split_scenes: bool = False):
-    data_utils.create_dimo_masks(DIMO_PATH, subsets, override=override)
+def prepare_subsets(subsets: list, override: bool = False, split_scenes: bool = False):
+    #data_utils.create_dimo_masks(DIMO_PATH, subsets, override=override)
     data_utils.create_dimo_train_split(DIMO_PATH, subsets, seed=10, split_scenes=split_scenes)
 
 
-def show_subsets(subsets):
+def show_subsets(subsets: list):
     dataset_train, dataset_val, config = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets)
     config.USE_MINI_MASK = False
 
@@ -53,20 +53,23 @@ def show_subsets(subsets):
         mrcnn_visualise.display_instances(image, gt_bbox, gt_mask, gt_class_id, dataset_train.class_names, title=image_info['id'])
 
 
-def test_subsets(subsets, model_id):
+def test_subsets(subsets: list, model_id: str):
     iou = 0.5
     dataset, config = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, subsets)
 
     model = evaluation.load_model(model_id, config)
-    results = evaluation.get_detections(dataset, model, config)
+    results = evaluation.get_detections_dataset(dataset, model, config)
     map = evaluation.compute_map(results, dataset, config, iou)
+    precision, recall = evaluation.compute_mean_pand(results, dataset, config, iou)
 
     print(f"maP @ iou = {iou} = {map}")
+    print(f"precision @ iou = {iou} = {precision}")
+    print(f"recall @ iou = {iou} = {recall}")
 
     evaluation.show_results(results, dataset, config)
 
 
-def test_folder(folder,  model_id, num_classes, select_roi=False, save_folder=None):
+def test_folder(folder: str,  model_id: str, num_classes: int, select_roi=False, save_folder=None):
     config = data.mrcnn_dimo.DimoInferenceConfig(num_classes=num_classes)
     model = evaluation.load_model(model_id, config)
 
@@ -90,6 +93,8 @@ def test_folder(folder,  model_id, num_classes, select_roi=False, save_folder=No
             scores=result['scores']
         )
 
+        plot = cv2.cvtColor(plot, cv2.COLOR_RGB2BGR)
+
         if save_folder:
             cv2.imwrite(os.path.join(save_folder, f"{i}.png"), plot)
         else:
@@ -98,4 +103,4 @@ def test_folder(folder,  model_id, num_classes, select_roi=False, save_folder=No
 
 
 if __name__ == "__main__":
-    test_folder("C:/Users/bvanherle/Documents/Datasets/deo/fase_1", "deo_002", 5, select_roi=True)
+    test_subsets(["debug"], "deo_002")
