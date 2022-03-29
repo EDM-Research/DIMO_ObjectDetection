@@ -53,7 +53,7 @@ def show_subsets(subsets: list):
         mrcnn_visualise.display_instances(image, gt_bbox, gt_mask, gt_class_id, dataset_train.class_names, title=image_info['id'])
 
 
-def test_subsets(subsets: list, model_id: str):
+def test_subsets(subsets: list, model_id: str, save_results: bool = False):
     iou = 0.5
     dataset, config = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, subsets)
 
@@ -66,7 +66,10 @@ def test_subsets(subsets: list, model_id: str):
     print(f"precision @ iou = {iou} = {precision}")
     print(f"recall @ iou = {iou} = {recall}")
 
-    visualize.show_results(results, dataset, config)
+    if save_results:
+        visualize.save_results(results, dataset, config, 'results/')
+    else:
+        visualize.show_results(results, dataset, config)
 
 
 def test_folder(folder: str,  model_id: str, num_classes: int, select_roi=False, save_folder=None):
