@@ -139,4 +139,5 @@ wandb/
 
 weights/
 models/
+results/
 config.ini
