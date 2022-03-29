@@ -10,6 +10,7 @@ parser.add_argument('-o', action='store_true')
 parser.add_argument('-a', action='store_true')
 parser.add_argument('-t', action='store_true')
 parser.add_argument('-s', action='store_true')
+parser.add_argument('--save', action='store_true')
 args = parser.parse_args()
 
 action = args.action
@@ -26,6 +27,7 @@ elif action == 'train':
     model_id = args.model
     train_subsets(args.subsets, augment=augment, transfer_learning=transfer_learning, model_id=model_id)
 elif action == 'test':
-    test_subsets(args.subsets, args.model)
+    save = args.save
+    test_subsets(args.subsets, args.model, save_results=save)
 else:
     parser.print_help()
