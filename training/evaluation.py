@@ -2,7 +2,6 @@ from mrcnn.utils import Dataset, compute_ap, compute_matches
 from mrcnn.config import Config
 import mrcnn.model as modellib
 import numpy as np
-from mrcnn import visualize
 import os
 
 
@@ -119,7 +118,3 @@ def compute_map(results: list, dataset: Dataset, config: Config, iou_threshold: 
     return np.mean(aps)
 
 
-def show_results(results: list, dataset: Dataset, config: Config):
-    for result in results:
-        image, image_meta, gt_class_id, gt_bbox, gt_mask = modellib.load_image_gt(dataset, config, result['image_id'])
-        visualize.display_instances(image, result['rois'], result['masks'], result['class_ids'], dataset.class_names)

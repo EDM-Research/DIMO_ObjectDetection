@@ -1,8 +1,17 @@
 import numpy as np
 from mrcnn import visualize as mrcnn_vis
+import mrcnn.model as mrcnn_model
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
+from mrcnn.utils import Dataset
+from mrcnn.config import Config
+
+
+def show_results(results: list, dataset: Dataset, config: Config):
+    for result in results:
+        image, image_meta, gt_class_id, gt_bbox, gt_mask = mrcnn_model.load_image_gt(dataset, config, result['image_id'])
+        mrcnn_vis.display_instances(image, result['rois'], result['masks'], result['class_ids'], dataset.class_names)
 
 
 def render_instances(image: np.array, boxes: list, masks: list, class_ids: list, class_names: list, scores: list) -> np.array:
