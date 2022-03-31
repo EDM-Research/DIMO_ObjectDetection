@@ -83,9 +83,7 @@ def convert_to_new_mask_format(path: str, subsets: List[str]) -> None:
 
 
 if __name__ == "__main__":
-    convert_to_new_mask_format("D:/Datasets/DIMO/dimo", ["real_jaigo_000-150",
+    convert_to_new_mask_format("F:/Data/dimo", ["real_jaigo_000-150",
                                                     "sim_jaigo_real_light_real_pose",
-                                                    "sim_jaigo_real_light_rand_pose",
-                                                    "sim_jaigo_rand_light_real_pose",
-                                                    "sim_jaigo_rand_light_rand_pose"]
+                                                    "sim_jaigo_rand_light_real_pose"]
                                )

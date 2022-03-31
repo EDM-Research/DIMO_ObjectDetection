@@ -1,11 +1,12 @@
 import argparse
-from main import prepare_subsets, train_subsets, show_subsets, test_subsets
+from main import prepare_subsets, train_subsets, show_subsets, test_subsets, test_batch
 
 
 parser = argparse.ArgumentParser()
 parser.add_argument('action', type=str)
 parser.add_argument('--subsets', required=True, type=str, nargs='+')
 parser.add_argument('--model', type=str, default=None)
+parser.add_argument('--file', type=str, default=None)
 parser.add_argument('-o', action='store_true')
 parser.add_argument('-a', action='store_true')
 parser.add_argument('-t', action='store_true')
@@ -27,7 +28,10 @@ elif action == 'train':
     model_id = args.model
     train_subsets(args.subsets, augment=augment, transfer_learning=transfer_learning, model_id=model_id)
 elif action == 'test':
-    save = args.save
-    test_subsets(args.subsets, args.model, save_results=save)
+    if args.file:
+        test_batch(args.file)
+    else:
+        save = args.save
+        test_subsets(args.subsets, args.model, save_results=save)
 else:
     parser.print_help()

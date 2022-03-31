@@ -51,7 +51,7 @@ def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Confi
 
     model.train(train_set, val_set,
                 learning_rate=config.LEARNING_RATE,
-                epochs=100,
+                epochs=400,
                 layers='heads' if use_coco_weights else 'all',
                 augmentation=augmenters,
                 custom_callbacks=custom_callbacks)

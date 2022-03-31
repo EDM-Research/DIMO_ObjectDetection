@@ -20,6 +20,35 @@ config.read('config.ini')
 DIMO_PATH = config['USER_SETTINGS']['dimo_path']
 
 
+def test_batch(batch_file: str):
+    results = []
+    with open(batch_file, 'r') as f:
+        for line in f:
+            line_split = line.split(",")
+            assert len(line_split) == 2, "Batch test file should be in format 'model_id,subset'"
+
+            model_id, subset = line_split
+            results.append([model_id, subset.rstrip()])
+
+    for i in range(len(results)):
+        model_id, subset = results[i]
+        iou = 0.5
+        dataset, config = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, [subset])
+
+        model = evaluation.load_model(model_id, config)
+        results = evaluation.get_detections_dataset(dataset, model, config)
+        map = evaluation.compute_map(results, dataset, config, iou)
+        precision, recall = evaluation.compute_mean_pand(results, dataset, config, iou)
+
+        results[i].extend([f"{map*100:.2f}", f"{precision*100:.2f}", f"{recall*100:.2f}"])
+
+    filename = f"{batch_file.split('.')[0]}_results.csv"
+    with open(filename, 'w') as f:
+        f.write("model_id,subset,map,precision,recall\n")
+        for result in results:
+            f.write(f"{','.join(result)}\n")
+
+
 def train_subsets(subsets: list, model_id: str=None, augment: bool = False, transfer_learning: bool = False):
     from training import mrcnn
 
@@ -106,4 +135,4 @@ def test_folder(folder: str,  model_id: str, num_classes: int, select_roi=False,
 
 
 if __name__ == "__main__":
-    test_subsets(["debug"], "deo_002")
+    train_subsets(["real_jaigo_000-150"])
