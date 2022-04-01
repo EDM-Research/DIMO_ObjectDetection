@@ -4,7 +4,7 @@ from main import prepare_subsets, train_subsets, show_subsets, test_subsets, tes
 
 parser = argparse.ArgumentParser()
 parser.add_argument('action', type=str)
-parser.add_argument('--subsets', required=True, type=str, nargs='+')
+parser.add_argument('--subsets', type=str, nargs='+')
 parser.add_argument('--model', type=str, default=None)
 parser.add_argument('--file', type=str, default=None)
 parser.add_argument('-o', action='store_true')
