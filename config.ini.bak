@@ -1,6 +1,0 @@
-[USER_SETTINGS]
-dimo_path = D:/Datasets/DIMO/dimo
-images_per_gpu = 4
-wandb = False
-wandb_project = dimo-object-detection
-wandb_entity = bvanherle
