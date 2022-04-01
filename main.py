@@ -21,17 +21,17 @@ DIMO_PATH = config['USER_SETTINGS']['dimo_path']
 
 
 def test_batch(batch_file: str):
-    results = []
+    result_collection = []
     with open(batch_file, 'r') as f:
         for line in f:
             line_split = line.split(",")
             assert len(line_split) == 2, "Batch test file should be in format 'model_id,subset'"
 
             model_id, subset = line_split
-            results.append([model_id, subset.rstrip()])
+            result_collection.append([model_id, subset.rstrip()])
 
-    for i in range(len(results)):
-        model_id, subset = results[i]
+    for i in range(len(result_collection)):
+        model_id, subset = result_collection[i]
         iou = 0.5
         dataset, config = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, [subset])
 
@@ -40,12 +40,12 @@ def test_batch(batch_file: str):
         map = evaluation.compute_map(results, dataset, config, iou)
         precision, recall = evaluation.compute_mean_pand(results, dataset, config, iou)
 
-        results[i].extend([f"{map*100:.2f}", f"{precision*100:.2f}", f"{recall*100:.2f}"])
+        result_collection[i].extend([f"{map*100:.2f}", f"{precision*100:.2f}", f"{recall*100:.2f}"])
 
     filename = f"{batch_file.split('.')[0]}_results.csv"
     with open(filename, 'w') as f:
         f.write("model_id,subset,map,precision,recall\n")
-        for result in results:
+        for result in result_collection:
             f.write(f"{','.join(result)}\n")
 
 
