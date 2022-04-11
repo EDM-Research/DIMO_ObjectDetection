@@ -5,10 +5,21 @@ import numpy as np
 import os
 
 
-def get_file_for_epoch(model_dir: str, epoch: int = None) -> str:
-    def get_epoch_no(file_name: str) -> int:
-        return int(file_name.split('.')[0].split('_')[-1])
+def get_epoch_no(file_name: str) -> int:
+    return int(file_name.split('.')[0].split('_')[-1])
 
+
+def get_available_epochs(model_dir: str) -> list:
+    epochs = []
+
+    for file in os.listdir(model_dir):
+        if file.endswith('.h5'):
+            epochs.append(get_epoch_no(file) - 1)
+
+    return epochs
+
+
+def get_file_for_epoch(model_dir: str, epoch: int = None) -> str:
     last_epoch = 0
     last_epoch_file = ""
 

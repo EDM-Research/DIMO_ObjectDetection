@@ -134,5 +134,9 @@ def test_folder(folder: str,  model_id: str, num_classes: int, select_roi=False,
             cv2.waitKey(0)
 
 
+def test_epochs(subsets: list, model_id: str):
+    available_epochs = evaluation.get_available_epochs(model_id)
+
+
 if __name__ == "__main__":
     train_subsets(["real_jaigo_000-150"])
