@@ -1,4 +1,6 @@
 import skimage
+from matplotlib import pyplot as plt
+
 import data.mrcnn_dimo
 from data import utils as data_utils
 from data import mrcnn_dimo
@@ -134,9 +136,43 @@ def test_folder(folder: str,  model_id: str, num_classes: int, select_roi=False,
             cv2.waitKey(0)
 
 
-def test_epochs(subsets: list, model_id: str):
-    available_epochs = evaluation.get_available_epochs(model_id)
+def test_epochs(subsets: list, models: list):
+    test_frequency = 50
+    iou = 0.5
+    dataset, config = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, subsets)
+
+    results_dict = {}
+
+    for model_id in models:
+        available_epochs = np.array(evaluation.get_available_epochs(f"models/{model_id}"))
+        test_epochs = np.arange(0, np.max(available_epochs) + 1, test_frequency).astype(np.int)
+        test_epochs[0] += 1
+        tested_epochs = []
+        maps = []
+        for epoch in test_epochs:
+            if epoch in available_epochs:
+                model = evaluation.load_model(model_id, config, epoch)
+                results = evaluation.get_detections_dataset(dataset, model, config)
+                map = evaluation.compute_map(results, dataset, config, iou)
+
+                tested_epochs.append(epoch)
+                maps.append(map)
+
+        results_dict[model_id] = {
+            'tested_epochs': tested_epochs,
+            'maps': maps
+        }
+
+    with plt.style.context('Solarize_Light2'):
+        for model_id in models:
+            plt.plot(results_dict[model_id]['tested_epochs'], results_dict[model_id]['maps'], label = model_id)
+
+        plt.legend()
+        plt.show()
+        plt.xlabel("Epoch")
+        plt.ylabel("mAP")
+
 
 
 if __name__ == "__main__":
-    train_subsets(["real_jaigo_000-150"])
+    test_epochs(["real_jaigo_000-150"], ["dimo20220329T1056"])

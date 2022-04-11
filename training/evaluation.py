@@ -14,7 +14,7 @@ def get_available_epochs(model_dir: str) -> list:
 
     for file in os.listdir(model_dir):
         if file.endswith('.h5'):
-            epochs.append(get_epoch_no(file) - 1)
+            epochs.append(get_epoch_no(file))
 
     return epochs
 
@@ -25,7 +25,7 @@ def get_file_for_epoch(model_dir: str, epoch: int = None) -> str:
 
     for file in os.listdir(model_dir):
         if file.endswith('.h5'):
-            current_epoch = get_epoch_no(file) - 1
+            current_epoch = get_epoch_no(file)
             if current_epoch > last_epoch:
                 last_epoch = current_epoch
                 last_epoch_file = file
