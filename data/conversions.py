@@ -2,10 +2,13 @@ import os, json
 import cv2
 from typing import List, Tuple
 import numpy as np
+import skimage
+
 from data.dimo_loader import DimoLoader
 from pathlib import Path
 from data.utils import create_or_empty_folder, get_file_count
 import shutil
+import mrcnn.utils
 
 
 def get_bbox(img: np.array) -> Tuple[int, int, int, int]:
@@ -82,8 +85,51 @@ def convert_to_new_mask_format(path: str, subsets: List[str]) -> None:
             os.rmdir(old_masks_path)
 
 
+def shrink_dataset(path: str, target_path: str) -> None:
+    for file in os.listdir(path):
+        file_path = os.path.join(path, file)
+        twin_file_path = os.path.join(target_path, file)
+        if os.path.isdir(file_path):
+            if file == "models":
+                shutil.copytree(file_path, twin_file_path)
+            else:
+                create_or_empty_folder(twin_file_path)
+                for subfile in os.listdir(file_path):
+                    subfile_path = os.path.join(file_path, subfile)
+                    twin_subfile_path = os.path.join(twin_file_path, subfile)
+                    if os.path.isdir(subfile_path):
+                        create_or_empty_folder(twin_subfile_path)
+
+                        shutil.copyfile(os.path.join(subfile_path, "scene_camera.json"),
+                                        os.path.join(twin_subfile_path, "scene_camera.json"))
+                        shutil.copyfile(os.path.join(subfile_path, "scene_gt.json"),
+                                        os.path.join(twin_subfile_path, "scene_gt.json"))
+                        shutil.copyfile(os.path.join(subfile_path, "scene_gt_world.json"),
+                                        os.path.join(twin_subfile_path, "scene_gt_world.json"))
+                        shutil.copyfile(os.path.join(subfile_path, "scene_info.json"),
+                                        os.path.join(twin_subfile_path, "scene_info.json"))
+
+                        mask_path = os.path.join(subfile_path, "mask_visib")
+                        rgb_path = os.path.join(subfile_path, "rgb")
+
+                        twin_mask_path = os.path.join(twin_subfile_path, "mask_visib")
+                        twin_rgb_path = os.path.join(twin_subfile_path, "rgb")
+
+                        create_or_empty_folder(twin_rgb_path)
+                        create_or_empty_folder(twin_mask_path)
+                        for file in os.listdir(rgb_path):
+                            rgb = skimage.io.imread(os.path.join(rgb_path, file))
+                            small_rgb = mrcnn.utils.resize(rgb, (820, 1024), preserve_range=True).astype(np.uint8)
+                            skimage.io.imsave(os.path.join(twin_rgb_path, file), small_rgb)
+
+                        for file in os.listdir(mask_path):
+                            mask = skimage.io.imread(os.path.join(mask_path, file))
+                            small_mask = mrcnn.utils.resize(mask, (820, 1024), preserve_range=True).astype(np.uint8)
+                            skimage.io.imsave(os.path.join(twin_mask_path, file), small_mask)
+
+                    else:
+                        shutil.copyfile(subfile_path, twin_subfile_path)
+
+
 if __name__ == "__main__":
-    convert_to_new_mask_format("F:/Data/dimo", ["real_jaigo_000-150",
-                                                    "sim_jaigo_real_light_real_pose",
-                                                    "sim_jaigo_rand_light_real_pose"]
-                               )
+    shrink_dataset("C:/Users/bvanherle/Documents/Datasets/dimo", "C:/Users/bvanherle/Documents/Datasets/dimo_small")

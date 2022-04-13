@@ -118,13 +118,19 @@ def test_folder(folder: str,  model_id: str, num_classes: int, select_roi=False,
             input_image = input_image[r[0]:r[1], r[2]: r[3]]
         result = model.detect([input_image])[0]
 
+        class_names = [
+            "Background",
+            "DoubleHook",
+            "DoubleNeedle"
+        ]
+
         plot = visualize.render_instances(
             image=input_image,
             boxes=result['rois'],
             masks=result['masks'],
             class_ids=result['class_ids'],
-            class_names=[str(i) for i in range(num_classes)],
-            scores=result['scores']
+            class_names=class_names,
+            scores=result['scores'],
         )
 
         plot = cv2.cvtColor(plot, cv2.COLOR_RGB2BGR)
@@ -133,7 +139,7 @@ def test_folder(folder: str,  model_id: str, num_classes: int, select_roi=False,
             cv2.imwrite(os.path.join(save_folder, f"{i}.png"), plot)
         else:
             cv2.imshow("Result", plot)
-            cv2.waitKey(0)
+            cv2.waitKey(1)
 
 
 def test_epochs(subsets: list, models: list):
@@ -173,6 +179,5 @@ def test_epochs(subsets: list, models: list):
         plt.ylabel("mAP")
 
 
-
 if __name__ == "__main__":
-    test_epochs(["real_jaigo_000-150"], ["dimo20220329T1056"])
+    show_subsets(["debug"])
