@@ -9,7 +9,7 @@ from mrcnn import utils as mrcnn_utils
 from mrcnn import visualize as mrcnn_visualise
 from mrcnn import model as modellib
 from training import evaluation
-from utils import visualize, interactions
+from utils import visualize, interactions, file_io
 import configparser
 import cv2
 import numpy as np
@@ -23,14 +23,7 @@ DIMO_PATH = config['USER_SETTINGS']['dimo_path']
 
 
 def test_batch(batch_file: str):
-    result_collection = []
-    with open(batch_file, 'r') as f:
-        for line in f:
-            line_split = line.split(",")
-            assert len(line_split) == 2, "Batch test file should be in format 'model_id,subset'"
-
-            model_id, subset = line_split
-            result_collection.append([model_id, subset.rstrip()])
+    result_collection = file_io.read_test_batch(batch_file)
 
     for i in range(len(result_collection)):
         model_id, subset = result_collection[i]
