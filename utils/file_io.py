@@ -1,7 +1,7 @@
 from typing import Tuple, List
 
 
-def read_test_batch(file_path: str) -> List[List[str, str]]:
+def read_test_batch(file_path: str) -> List[List[str]]:
     tests = []
     with open(file_path, 'r') as f:
         for line in f:

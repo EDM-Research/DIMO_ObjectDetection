@@ -8,13 +8,12 @@ import os, random
 from mrcnn import utils as mrcnn_utils
 from mrcnn import visualize as mrcnn_visualise
 from mrcnn import model as modellib
-from training import evaluation
+from training import evaluation, detection
 from utils import visualize, interactions, file_io
 import configparser
 import cv2
 import numpy as np
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from matplotlib.figure import Figure
+from training import mrcnn as mrcnn_training
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -30,8 +29,8 @@ def test_batch(batch_file: str):
         iou = 0.5
         dataset, config = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, [subset])
 
-        model = evaluation.load_model(model_id, config)
-        results = evaluation.get_detections_dataset(dataset, model, config)
+        model = mrcnn_training.load_model(model_id, config)
+        results = detection.get_detections_dataset(dataset, model, config)
         map = evaluation.compute_map(results, dataset, config, iou)
         precision, recall = evaluation.compute_mean_pand(results, dataset, config, iou)
 
@@ -45,16 +44,14 @@ def test_batch(batch_file: str):
 
 
 def train_subsets(subsets: list, model_id: str=None, augment: bool = False, transfer_learning: bool = False):
-    from training import mrcnn
-
     train, val, config = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets)
 
-    model = evaluation.load_model(model_id, config, mode="training") if model_id else None
+    model = mrcnn_training.load_model(model_id, config, mode="training") if model_id else None
 
     print(f"training images: {len(train.image_ids)}")
     print(f"validation images: {len(val.image_ids)}")
 
-    mrcnn.train(train, val, config, augment=augment, use_coco_weights=transfer_learning, checkpoint_model=model)
+    mrcnn_training.train(train, val, config, augment=augment, use_coco_weights=transfer_learning, checkpoint_model=model)
 
 
 def prepare_subsets(subsets: list, override: bool = False, split_scenes: bool = False):
@@ -81,8 +78,8 @@ def test_subsets(subsets: list, model_id: str, save_results: bool = False):
     iou = 0.5
     dataset, config = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, subsets)
 
-    model = evaluation.load_model(model_id, config)
-    results = evaluation.get_detections_dataset(dataset, model, config)
+    model = mrcnn_training.load_model(model_id, config)
+    results = detection.get_detections_dataset(dataset, model, config)
     map = evaluation.compute_map(results, dataset, config, iou)
     precision, recall = evaluation.compute_mean_pand(results, dataset, config, iou)
 
@@ -98,7 +95,7 @@ def test_subsets(subsets: list, model_id: str, save_results: bool = False):
 
 def test_folder(folder: str,  model_id: str, num_classes: int, select_roi=False, save_folder=None):
     config = data.mrcnn_dimo.DimoInferenceConfig(num_classes=num_classes)
-    model = evaluation.load_model(model_id, config)
+    model = mrcnn_training.load_model(model_id, config)
 
     images = [cv2.imread(os.path.join(folder, file)) for file in os.listdir(folder) if file.endswith(".jpg") or file.endswith(".png") or file.endswith(".jpeg")]
 
@@ -111,11 +108,7 @@ def test_folder(folder: str,  model_id: str, num_classes: int, select_roi=False,
             input_image = input_image[r[0]:r[1], r[2]: r[3]]
         result = model.detect([input_image])[0]
 
-        class_names = [
-            "Background",
-            "DoubleHook",
-            "DoubleNeedle"
-        ]
+        class_names = [str(i) for i in range(num_classes)]
 
         plot = visualize.render_instances(
             image=input_image,
@@ -143,15 +136,15 @@ def test_epochs(subsets: list, models: list):
     results_dict = {}
 
     for model_id in models:
-        available_epochs = np.array(evaluation.get_available_epochs(f"models/{model_id}"))
+        available_epochs = np.array(mrcnn_training.get_available_epochs(f"models/{model_id}"))
         test_epochs = np.arange(0, np.max(available_epochs) + 1, test_frequency).astype(np.int)
         test_epochs[0] += 1
         tested_epochs = []
         maps = []
         for epoch in test_epochs:
             if epoch in available_epochs:
-                model = evaluation.load_model(model_id, config, epoch)
-                results = evaluation.get_detections_dataset(dataset, model, config)
+                model = mrcnn_training.load_model(model_id, config, epoch)
+                results = detection.get_detections_dataset(dataset, model, config)
                 map = evaluation.compute_map(results, dataset, config, iou)
 
                 tested_epochs.append(epoch)
@@ -173,4 +166,4 @@ def test_epochs(subsets: list, models: list):
 
 
 if __name__ == "__main__":
-    show_subsets(["debug"])
+    test_folder("C:/Users/bvanherle/Documents/Datasets/deo/1-4DPS instruments", "deo_003", 5)

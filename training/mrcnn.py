@@ -2,6 +2,7 @@ from mrcnn import config, utils, model as modellib
 from training import augmentation
 import os
 import configparser
+from mrcnn.config import Config
 
 COCO_WEIGHTS_PATH = 'weights/mask_rcnn_coco.h5'
 
@@ -55,3 +56,43 @@ def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Confi
                 layers='heads' if use_coco_weights else 'all',
                 augmentation=augmenters,
                 custom_callbacks=custom_callbacks)
+
+
+def get_epoch_no(file_name: str) -> int:
+    return int(file_name.split('.')[0].split('_')[-1])
+
+
+def get_available_epochs(model_dir: str) -> list:
+    epochs = []
+
+    for file in os.listdir(model_dir):
+        if file.endswith('.h5'):
+            epochs.append(get_epoch_no(file))
+
+    return epochs
+
+
+def get_file_for_epoch(model_dir: str, epoch: int = None) -> str:
+    last_epoch = 0
+    last_epoch_file = ""
+
+    for file in os.listdir(model_dir):
+        if file.endswith('.h5'):
+            current_epoch = get_epoch_no(file)
+            if current_epoch > last_epoch:
+                last_epoch = current_epoch
+                last_epoch_file = file
+            if current_epoch == epoch:
+                return file
+
+    return last_epoch_file
+
+
+def load_model(model_id: str, config: Config, epoch: int = None, mode: str = "inference") -> modellib.MaskRCNN:
+    assert mode in ["training", "inference"], f"Mode can only be training or inference, not {mode}"
+    model = modellib.MaskRCNN(mode=mode, config=config, model_dir=f"models")
+    model_file = get_file_for_epoch(f"models/{model_id}", epoch)
+    model_path = f"models/{model_id}/{model_file}"
+    print(f"Loading model from {model_path}")
+    model.load_weights(model_path, by_name=True)
+    return model
