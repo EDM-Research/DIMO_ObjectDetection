@@ -63,4 +63,3 @@ def compute_map(results: list, dataset: Dataset, config: Config, iou_threshold: 
 
     return np.mean(aps)
 
-

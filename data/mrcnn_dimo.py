@@ -1,4 +1,6 @@
 import configparser
+import random
+
 from mrcnn import utils, visualize, config
 from data.dimo_loader import DimoLoader
 from pathlib import Path
@@ -38,7 +40,7 @@ class DimoInferenceConfig(config.Config):
 
 
 class DIMODataset(utils.Dataset):
-    def load_dataset(self, path: str, subsets: List[str], split: str = "train"):
+    def load_dataset(self, path: str, subsets: List[str], split: str = "train", image_count: int = None):
         assert split in ["train", "val", "test"]
         supported_extensions = ['png', 'jpg', 'jpeg']
         self.split = split
@@ -58,6 +60,9 @@ class DIMODataset(utils.Dataset):
         for subset_name in subsets:
             subset = dimo_ds[subset_name]
             image_ids = self.get_image_ids(path, subset_name)
+            if image_count:
+                random.seed(10)
+                image_ids = random.choices(image_ids, k=image_count)
             for scene in subset:
 
                 masks_path = os.path.join(scene['path'], 'mask_visib/')
@@ -126,9 +131,9 @@ class DIMODataset(utils.Dataset):
         return ids
 
 
-def get_dimo_datasets(path: str, subsets: List[str]) -> Tuple[DIMODataset, DIMODataset, DimoConfig]:
+def get_dimo_datasets(path: str, subsets: List[str], train_image_count: int = None) -> Tuple[DIMODataset, DIMODataset, DimoConfig]:
     dataset_train = DIMODataset()
-    dataset_train.load_dataset(path, subsets, split="train")
+    dataset_train.load_dataset(path, subsets, split="train", image_count=train_image_count)
     dataset_train.prepare()
 
     dataset_val = DIMODataset()
