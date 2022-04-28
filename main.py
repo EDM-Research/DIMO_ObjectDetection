@@ -60,7 +60,7 @@ def prepare_subsets(subsets: list, override: bool = False, split_scenes: bool = 
 
 
 def show_subsets(subsets: list):
-    dataset_train, dataset_val, config = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets)
+    dataset_train, dataset_val, config = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets, train_image_count=1755)
     config.USE_MINI_MASK = False
 
     print(f"training images: {len(dataset_train.image_ids)}")
@@ -166,4 +166,4 @@ def test_epochs(subsets: list, models: list):
 
 
 if __name__ == "__main__":
-    show_subsets(["debug"])
+    train_subsets(["sim_jaigo_real_light_real_pose"], train_image_count=1755)

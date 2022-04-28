@@ -62,7 +62,7 @@ class DIMODataset(utils.Dataset):
             image_ids = self.get_image_ids(path, subset_name)
             if image_count:
                 random.seed(10)
-                image_ids = random.choices(image_ids, k=image_count)
+                image_ids = random.sample(image_ids, min(image_count, len(image_ids)))
             for scene in subset:
 
                 masks_path = os.path.join(scene['path'], 'mask_visib/')
