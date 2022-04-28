@@ -43,8 +43,8 @@ def test_batch(batch_file: str):
             f.write(f"{','.join(result)}\n")
 
 
-def train_subsets(subsets: list, model_id: str=None, augment: bool = False, transfer_learning: bool = False):
-    train, val, config = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets)
+def train_subsets(subsets: list, model_id: str=None, augment: bool = False, transfer_learning: bool = False, train_image_count: int = None):
+    train, val, config = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets, train_image_count=train_image_count)
 
     model = mrcnn_training.load_model(model_id, config, mode="training") if model_id else None
 
