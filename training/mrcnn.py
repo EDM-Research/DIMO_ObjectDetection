@@ -6,6 +6,11 @@ from mrcnn.config import Config
 
 COCO_WEIGHTS_PATH = 'weights/mask_rcnn_coco.h5'
 
+import logging
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # FATAL
+logging.getLogger('tensorflow').setLevel(logging.FATAL)
+
 
 def get_wandb_info():
     user_config = configparser.ConfigParser()
@@ -44,7 +49,7 @@ def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Confi
     print(f"Saving model to {model.log_dir}\n")
     print(f"\nAugmentation: {augment}\t Transfer Learning: {use_coco_weights}\n")
 
-    if use_coco_weights:
+    if use_coco_weights and checkpoint_model is None:
         weights_path = COCO_WEIGHTS_PATH
         if not os.path.exists(weights_path):
             utils.download_trained_weights(weights_path)
@@ -52,7 +57,7 @@ def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Confi
 
     model.train(train_set, val_set,
                 learning_rate=config.LEARNING_RATE,
-                epochs=400,
+                epochs=100,
                 layers='heads' if use_coco_weights else 'all',
                 augmentation=augmenters,
                 custom_callbacks=custom_callbacks)

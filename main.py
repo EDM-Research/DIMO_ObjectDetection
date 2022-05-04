@@ -15,6 +15,7 @@ import cv2
 import numpy as np
 from training import mrcnn as mrcnn_training
 
+
 config = configparser.ConfigParser()
 config.read('config.ini')
 
@@ -166,4 +167,4 @@ def test_epochs(subsets: list, models: list):
 
 
 if __name__ == "__main__":
-    train_subsets(["sim_jaigo_real_light_real_pose"], train_image_count=1755)
+    train_subsets(["sim_jaigo_real_light_rand_pose"], train_image_count=1755, model_id="dimo20220503T0938")
