@@ -2,7 +2,13 @@ from mrcnn.utils import Dataset, compute_ap, compute_matches
 from mrcnn.config import Config
 import mrcnn.model as modellib
 import numpy as np
-import os
+
+
+class ModelTest:
+    def __init__(self, model_id: str, test_subset: str):
+        self.model_id = model_id
+        self.test_subset = test_subset
+        self.metrics = {}
 
 
 def compute_pandr(gt_boxes, gt_class_ids, gt_masks,

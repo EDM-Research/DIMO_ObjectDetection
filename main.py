@@ -23,25 +23,25 @@ DIMO_PATH = config['USER_SETTINGS']['dimo_path']
 
 
 def test_batch(batch_file: str):
-    result_collection = file_io.read_test_batch(batch_file)
+    model_tests = file_io.read_test_batch(batch_file)
 
-    for i in range(len(result_collection)):
-        model_id, subset = result_collection[i]
+    for test in model_tests:
         iou = 0.5
-        dataset, config = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, [subset])
+        dataset, config = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, [test.test_subset])
 
-        model = mrcnn_training.load_model(model_id, config)
+        model = mrcnn_training.load_model(test.model_id, config)
         results = detection.get_detections_dataset(dataset, model, config)
         map = evaluation.compute_map(results, dataset, config, iou)
         precision, recall = evaluation.compute_mean_pand(results, dataset, config, iou)
 
-        result_collection[i].extend([f"{map*100:.2f}", f"{precision*100:.2f}", f"{recall*100:.2f}"])
+        test.metrics = {
+            "map": map,
+            "precision": precision,
+            "recall": recall
+        }
 
     filename = f"{batch_file.split('.')[0]}_results.csv"
-    with open(filename, 'w') as f:
-        f.write("model_id,subset,map,precision,recall\n")
-        for result in result_collection:
-            f.write(f"{','.join(result)}\n")
+    file_io.write_test_metrics(model_tests, filename)
 
 
 def train_subsets(subsets: list, model_id: str=None, augment: bool = False, transfer_learning: bool = False, train_image_count: int = None):
