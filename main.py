@@ -89,9 +89,9 @@ def test_subsets(subsets: list, model_id: str, save_results: bool = False):
     print(f"recall @ iou = {iou} = {recall}")
 
     if save_results:
-        visualize.save_results(results, dataset, config, 'results/')
+        visualize.save_results(results, mrcnn_dimo.get_dataset_images(dataset, config), "results/", dataset.class_names)
     else:
-        visualize.show_results(results, dataset, config)
+        visualize.show_results(results, mrcnn_dimo.get_dataset_images(dataset, config), dataset.class_names)
 
 
 def test_folder(folder: str,  model_id: str, num_classes: int, select_roi=False, save_folder=None):
@@ -99,8 +99,8 @@ def test_folder(folder: str,  model_id: str, num_classes: int, select_roi=False,
     model = mrcnn_training.load_model(model_id, config)
 
     images = [cv2.cvtColor(cv2.imread(os.path.join(folder, file)),cv2.COLOR_BGR2RGB) for file in os.listdir(folder) if file.endswith(".jpg") or file.endswith(".png") or file.endswith(".jpeg")]
-    colors = visualize.get_colors(num_classes)
-    class_names = [str(i) for i in range(num_classes)]
+    #class_names = [str(i) for i in range(num_classes)]
+    class_names = ["bg", "Hook", "Needle"]
 
     if select_roi:
         rois = interactions.select_rois(images)
@@ -108,28 +108,10 @@ def test_folder(folder: str,  model_id: str, num_classes: int, select_roi=False,
 
     results = detection.get_detections_images(images, model)
 
-    imageno = 0
-    for result, image in zip(results, images):
-
-        plot = visualize.render_instances(
-            image=image,
-            boxes=result['rois'],
-            masks=result['masks'],
-            class_ids=result['class_ids'],
-            class_names=class_names,
-            scores=result['scores'],
-            class_colors=colors
-        )
-
-        plot = cv2.cvtColor(plot, cv2.COLOR_RGB2BGR)
-
-        if save_folder:
-            cv2.imwrite(os.path.join(save_folder, f"{imageno}.png"), plot)
-        else:
-            cv2.imshow("Result", plot)
-            cv2.waitKey(1)
-
-        imageno += 1
+    if save_folder:
+        visualize.save_results(results, images, save_folder, class_names)
+    else:
+        visualize.show_results(results, images, class_names)
 
 
 def test_epochs(subsets: list, models: list):
@@ -170,4 +152,4 @@ def test_epochs(subsets: list, models: list):
 
 
 if __name__ == "__main__":
-    test_folder("C:/Users/bvanherle/Documents/Datasets/toolkeypoints/NVD/reals", "nvd", 3, save_folder="C:/Users/bvanherle/Documents/Datasets/toolkeypoints/NVD/detection")
+    test_folder("C:/Users/bvanherle/Documents/Datasets/toolkeypoints/NVD/real", "nvd", 3, save_folder="C:/Users/bvanherle/Documents/Datasets/toolkeypoints/NVD/detection")

@@ -19,16 +19,18 @@ def get_colors(n: int) -> list:
     return colors
 
 
-def show_results(results: list, dataset: Dataset, config: Config):
-    for result in results:
-        image, *_ = mrcnn_model.load_image_gt(dataset, config, result['image_id'])
-        mrcnn_vis.display_instances(image, result['rois'], result['masks'], result['class_ids'], dataset.class_names)
+def show_results(results: list, images: list, class_names):
+    colors = get_colors(len(class_names))
+    for image, result in zip(images, results):
+        #image, *_ = mrcnn_model.load_image_gt(dataset, config, result['image_id'])
+        mrcnn_vis.display_instances(image, result['rois'], result['masks'], result['class_ids'], class_names, colors=colors)
 
 
-def save_results(results: list, dataset: Dataset, config: Config, location: str):
-    for i, result in enumerate(results):
-        image, *_ = mrcnn_model.load_image_gt(dataset, config, result['image_id'])
-        plot = render_instances(image, result['rois'], result['masks'], result['class_ids'], dataset.class_names, result['scores'])
+def save_results(results: list, images: list, location: str, class_names: list):
+    colors = get_colors(len(class_names))
+    for i, (image, result) in enumerate(zip(images, results)):
+        #image, *_ = mrcnn_model.load_image_gt(dataset, config, result['image_id'])
+        plot = render_instances(image, result['rois'], result['masks'], result['class_ids'], class_names, result['scores'], class_colors=colors)
         cv2.imwrite(os.path.join(location, f"{str(i).zfill(4)}.png"), cv2.cvtColor(plot, cv2.COLOR_RGB2BGR))
 
 

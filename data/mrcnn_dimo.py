@@ -1,7 +1,7 @@
 import configparser
 import random
 
-from mrcnn import utils, visualize, config
+from mrcnn import utils, visualize, config, model
 from data.dimo_loader import DimoLoader
 from pathlib import Path
 from typing import List, Tuple
@@ -153,3 +153,7 @@ def get_test_dimo_dataset(path: str, subsets: List[str]) -> Tuple[DIMODataset, D
     config = DimoInferenceConfig(len(dataset.class_ids))
 
     return dataset, config
+
+
+def get_dataset_images(dataset: DIMODataset, config: config.Config):
+    return [model.load_image_gt(dataset, config, id)[0] for id in dataset.image_ids]
