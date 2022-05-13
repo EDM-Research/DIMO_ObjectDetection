@@ -98,35 +98,38 @@ def test_folder(folder: str,  model_id: str, num_classes: int, select_roi=False,
     config = data.mrcnn_dimo.DimoInferenceConfig(num_classes=num_classes)
     model = mrcnn_training.load_model(model_id, config)
 
-    images = [cv2.imread(os.path.join(folder, file)) for file in os.listdir(folder) if file.endswith(".jpg") or file.endswith(".png") or file.endswith(".jpeg")]
+    images = [cv2.cvtColor(cv2.imread(os.path.join(folder, file)),cv2.COLOR_BGR2RGB) for file in os.listdir(folder) if file.endswith(".jpg") or file.endswith(".png") or file.endswith(".jpeg")]
+    colors = visualize.get_colors(num_classes)
+    class_names = [str(i) for i in range(num_classes)]
 
-    rois = interactions.select_rois(images) if select_roi else None
+    if select_roi:
+        rois = interactions.select_rois(images)
+        images = [image[r[0]:r[1], r[2]: r[3]] for r, image in zip(rois, images)]
 
-    for i, image in enumerate(images):
-        input_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        if rois:
-            r = rois[i]
-            input_image = input_image[r[0]:r[1], r[2]: r[3]]
-        result = model.detect([input_image])[0]
+    results = detection.get_detections_images(images, model)
 
-        class_names = [str(i) for i in range(num_classes)]
+    imageno = 0
+    for result, image in zip(results, images):
 
         plot = visualize.render_instances(
-            image=input_image,
+            image=image,
             boxes=result['rois'],
             masks=result['masks'],
             class_ids=result['class_ids'],
             class_names=class_names,
             scores=result['scores'],
+            class_colors=colors
         )
 
         plot = cv2.cvtColor(plot, cv2.COLOR_RGB2BGR)
 
         if save_folder:
-            cv2.imwrite(os.path.join(save_folder, f"{i}.png"), plot)
+            cv2.imwrite(os.path.join(save_folder, f"{imageno}.png"), plot)
         else:
             cv2.imshow("Result", plot)
             cv2.waitKey(1)
+
+        imageno += 1
 
 
 def test_epochs(subsets: list, models: list):
@@ -167,4 +170,4 @@ def test_epochs(subsets: list, models: list):
 
 
 if __name__ == "__main__":
-    train_subsets(["sim_jaigo_real_light_rand_pose"], train_image_count=1755, model_id="dimo20220503T0938")
+    test_folder("C:/Users/bvanherle/Documents/Datasets/toolkeypoints/NVD/reals", "nvd", 3, save_folder="C:/Users/bvanherle/Documents/Datasets/toolkeypoints/NVD/detection")
