@@ -131,5 +131,37 @@ def shrink_dataset(path: str, target_path: str) -> None:
                         shutil.copyfile(subfile_path, twin_subfile_path)
 
 
+def map_object_ids(path: str, subsets: List[str], id_map: dict) -> None:
+    for subset in subsets:
+        subset_path = os.path.join(path, subset)
+
+        for scene_dir in os.listdir(subset_path):
+            scene_path = os.path.join(subset_path, scene_dir)
+            if os.path.isdir(scene_path):
+                scene_gt_path = os.path.join(scene_path, "scene_gt.json")
+
+                with open(scene_gt_path, 'r') as f:
+                    scene = json.load(f)
+
+                    for image_id in scene.keys():
+                        image = scene[image_id]
+                        for object in image:
+                            if object["obj_id"] not in id_map.keys():
+                                print(f"Object id not found in id map: {object['obj_id']}")
+                            else:
+                                object["obj_id"] = id_map[object["obj_id"]]
+
+                with open(scene_gt_path, 'w') as f:
+                    json.dump(scene, f)
+
+
 if __name__ == "__main__":
-    shrink_dataset("C:/Users/bvanherle/Documents/Datasets/dimo", "C:/Users/bvanherle/Documents/Datasets/dimo_small")
+    map = {
+        "1": "11",
+        "2": "12",
+        "3": "13",
+        "4": "14",
+        "5": "15",
+        "6": "16"
+    }
+    map_object_ids("C:/Users/bvanherle/Documents/Datasets/dimo_g", ["debug"], map)

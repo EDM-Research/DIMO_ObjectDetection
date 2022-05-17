@@ -99,8 +99,7 @@ def test_folder(folder: str,  model_id: str, num_classes: int, select_roi=False,
     model = mrcnn_training.load_model(model_id, config)
 
     images = [cv2.cvtColor(cv2.imread(os.path.join(folder, file)),cv2.COLOR_BGR2RGB) for file in os.listdir(folder) if file.endswith(".jpg") or file.endswith(".png") or file.endswith(".jpeg")]
-    #class_names = [str(i) for i in range(num_classes)]
-    class_names = ["bg", "Hook", "Needle"]
+    class_names = [str(i) for i in range(num_classes)]
 
     if select_roi:
         rois = interactions.select_rois(images)
@@ -152,4 +151,4 @@ def test_epochs(subsets: list, models: list):
 
 
 if __name__ == "__main__":
-    test_folder("C:/Users/bvanherle/Documents/Datasets/toolkeypoints/NVD/real", "nvd", 3, save_folder="C:/Users/bvanherle/Documents/Datasets/toolkeypoints/NVD/detection")
+    test_folder("C:/Users/bvanherle/Documents/Datasets/deo/1-4DPS instruments/", "deo_004", 9, save_folder="C:/Users/bvanherle/Documents/Datasets/deo/results/004")
