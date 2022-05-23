@@ -22,12 +22,22 @@ def get_wandb_info():
         return user_config['USER_SETTINGS']['wandb_project'], user_config['USER_SETTINGS']['wandb_entity']
 
 
+def get_model_folder():
+    user_config = configparser.ConfigParser()
+    user_config.read('config.ini')
+
+    if 'model_folder' in user_config['USER_SETTINGS'].keys():
+        return user_config['USER_SETTINGS']['model_folder']
+    else:
+        return 'models'
+
+
 def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Config, use_coco_weights: bool = True, augment: bool = True, checkpoint_model: modellib.MaskRCNN = None):
     augmenters = augmentation.augmenters if augment else None
     if checkpoint_model:
         model = checkpoint_model
     else:
-        model = modellib.MaskRCNN(mode="training", config=config, model_dir='models')
+        model = modellib.MaskRCNN(mode="training", config=config, model_dir=get_model_folder())
 
     custom_callbacks = []
 
@@ -95,9 +105,9 @@ def get_file_for_epoch(model_dir: str, epoch: int = None) -> str:
 
 def load_model(model_id: str, config: Config, epoch: int = None, mode: str = "inference") -> modellib.MaskRCNN:
     assert mode in ["training", "inference"], f"Mode can only be training or inference, not {mode}"
-    model = modellib.MaskRCNN(mode=mode, config=config, model_dir=f"models")
-    model_file = get_file_for_epoch(f"models/{model_id}", epoch)
-    model_path = f"models/{model_id}/{model_file}"
+    model = modellib.MaskRCNN(mode=mode, config=config, model_dir=get_model_folder())
+    model_file = get_file_for_epoch(f"{get_model_folder()}/{model_id}", epoch)
+    model_path = f"{get_model_folder()}/{model_id}/{model_file}"
     print(f"Loading model from {model_path}")
     model.load_weights(model_path, by_name=True)
     return model

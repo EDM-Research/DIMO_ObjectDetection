@@ -121,7 +121,7 @@ def test_epochs(subsets: list, models: list):
     results_dict = {}
 
     for model_id in models:
-        available_epochs = np.array(mrcnn_training.get_available_epochs(f"models/{model_id}"))
+        available_epochs = np.array(mrcnn_training.get_available_epochs(f"{mrcnn_training.get_model_folder()}/{model_id}"))
         test_epochs = np.arange(0, np.max(available_epochs) + 1, test_frequency).astype(np.int)
         test_epochs[0] += 1
         tested_epochs = []
