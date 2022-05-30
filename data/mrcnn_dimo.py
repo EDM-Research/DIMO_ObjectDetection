@@ -40,8 +40,9 @@ class DimoInferenceConfig(config.Config):
 
 
 class DIMODataset(utils.Dataset):
-    def load_dataset(self, path: str, subsets: List[str], split: str = "train", image_count: int = None):
+    def load_dataset(self, path: str, subsets: List[str], split: str = "train", image_counts: list = None):
         assert split in ["train", "val", "test"]
+        assert image_counts is None or len(image_counts) == len(subsets), "Image count needs to be specified for each subset"
         supported_extensions = ['png', 'jpg', 'jpeg']
         self.split = split
         self.subsets = subsets
@@ -57,12 +58,12 @@ class DIMODataset(utils.Dataset):
             self.add_class("dimo", i + 1, str(model))
             model_to_id[str(model)] = i + 1
 
-        for subset_name in subsets:
+        for subset_id, subset_name in enumerate(subsets):
             subset = dimo_ds[subset_name]
             image_ids = self.get_image_ids(path, subset_name)
-            if image_count:
+            if image_counts:
                 random.seed(10)
-                image_ids = random.sample(image_ids, min(image_count, len(image_ids)))
+                image_ids = random.sample(image_ids, min(image_counts[subset_id], len(image_ids)))
             for scene in subset:
 
                 masks_path = os.path.join(scene['path'], 'mask_visib/')
@@ -131,9 +132,9 @@ class DIMODataset(utils.Dataset):
         return ids
 
 
-def get_dimo_datasets(path: str, subsets: List[str], train_image_count: int = None) -> Tuple[DIMODataset, DIMODataset, DimoConfig]:
+def get_dimo_datasets(path: str, subsets: List[str], train_image_counts: list = None) -> Tuple[DIMODataset, DIMODataset, DimoConfig]:
     dataset_train = DIMODataset()
-    dataset_train.load_dataset(path, subsets, split="train", image_count=train_image_count)
+    dataset_train.load_dataset(path, subsets, split="train", image_counts=train_image_counts)
     dataset_train.prepare()
 
     dataset_val = DIMODataset()

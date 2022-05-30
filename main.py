@@ -44,8 +44,8 @@ def test_batch(batch_file: str):
     file_io.write_test_metrics(model_tests, filename)
 
 
-def train_subsets(subsets: list, model_id: str=None, augment: bool = False, transfer_learning: bool = False, train_image_count: int = None):
-    train, val, config = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets, train_image_count=train_image_count)
+def train_subsets(subsets: list, model_id: str = None, augment: bool = False, transfer_learning: bool = False, train_image_counts: list = None):
+    train, val, config = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets, train_image_counts=train_image_counts)
 
     model = mrcnn_training.load_model(model_id, config, mode="training") if model_id else None
 
@@ -61,7 +61,7 @@ def prepare_subsets(subsets: list, override: bool = False, split_scenes: bool = 
 
 
 def show_subsets(subsets: list):
-    dataset_train, dataset_val, config = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets, train_image_count=1755)
+    dataset_train, dataset_val, config = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets)
     config.USE_MINI_MASK = False
 
     print(f"training images: {len(dataset_train.image_ids)}")
@@ -151,4 +151,4 @@ def test_epochs(subsets: list, models: list):
 
 
 if __name__ == "__main__":
-    test_folder("C:/Users/bvanherle/Documents/Datasets/deo/1-4DPS instruments/", "deo_004", 9, save_folder="C:/Users/bvanherle/Documents/Datasets/deo/results/004")
+    test_folder("C:/Users/bvanherle/Documents/Datasets/deo/1-4DPS instruments/", "deo_005", 5, save_folder="C:/Users/bvanherle/Documents/Datasets/deo/results/005")

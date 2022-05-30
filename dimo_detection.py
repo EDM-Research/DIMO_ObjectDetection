@@ -7,7 +7,7 @@ parser.add_argument('action', type=str)
 parser.add_argument('--subsets', type=str, nargs='+')
 parser.add_argument('--model', type=str, default=None)
 parser.add_argument('--file', type=str, default=None)
-parser.add_argument('--image_count', type=int, default=None)
+parser.add_argument('--image_counts', type=int, default=None, nargs='+')
 parser.add_argument('-o', action='store_true')
 parser.add_argument('-a', action='store_true')
 parser.add_argument('-t', action='store_true')
@@ -25,10 +25,10 @@ elif action == 'show':
     show_subsets(args.subsets)
 elif action == 'train':
     augment = args.a
-    train_image_count = args.image_count
+    train_image_counts = args.image_counts
     transfer_learning = args.t
     model_id = args.model
-    train_subsets(args.subsets, augment=augment, transfer_learning=transfer_learning, model_id=model_id, train_image_count=train_image_count)
+    train_subsets(args.subsets, augment=augment, transfer_learning=transfer_learning, model_id=model_id, train_image_counts=train_image_counts)
 elif action == 'test':
     if args.file:
         test_batch(args.file)
