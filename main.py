@@ -44,15 +44,25 @@ def test_batch(batch_file: str):
     file_io.write_test_metrics(model_tests, filename)
 
 
-def train_subsets(subsets: list, model_id: str = None, augment: bool = False, transfer_learning: bool = False, train_image_counts: list = None):
+def train_subsets(subsets: list, model_id: str = None, augment: bool = False, transfer_learning: bool = False,
+                  train_image_counts: list = None, ft_subsets: list = None, ft_image_count: int = None):
+    # load training set
     train, val, config = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets, train_image_counts=train_image_counts)
-
-    model = mrcnn_training.load_model(model_id, config, mode="training") if model_id else None
 
     print(f"training images: {len(train.image_ids)}")
     print(f"validation images: {len(val.image_ids)}")
 
-    mrcnn_training.train(train, val, config, augment=augment, use_coco_weights=transfer_learning, checkpoint_model=model)
+    # if specified, load fintuning dataset
+    ft_train = None
+    if ft_subsets:
+        ft_train, _, _ = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, ft_subsets, train_image_counts=ft_image_count)
+
+        print(f"finetuning images: {len(ft_train.image_ids)}")
+
+    # load model to continue training, if specified
+    model = mrcnn_training.load_model(model_id, config, mode="training") if model_id else None
+    # train model
+    mrcnn_training.train(train, val, config, augment=augment, use_coco_weights=transfer_learning, checkpoint_model=model, ft_train_set=ft_train)
 
 
 def prepare_subsets(subsets: list, override: bool = False, split_scenes: bool = False):

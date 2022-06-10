@@ -32,7 +32,8 @@ def get_model_folder():
         return 'models'
 
 
-def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Config, use_coco_weights: bool = True, augment: bool = True, checkpoint_model: modellib.MaskRCNN = None):
+def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Config, use_coco_weights: bool = True,
+          augment: bool = True, checkpoint_model: modellib.MaskRCNN = None, ft_train_set: utils.Dataset = None):
     augmenters = augmentation.augmenters if augment else None
     if checkpoint_model:
         model = checkpoint_model
@@ -65,12 +66,21 @@ def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Confi
             utils.download_trained_weights(weights_path)
         model.load_weights(weights_path, by_name=True, exclude=["mrcnn_class_logits", "mrcnn_bbox_fc", "mrcnn_bbox", "mrcnn_mask"])
 
+    train_epochs = 75 if ft_train_set else 100
     model.train(train_set, val_set,
                 learning_rate=config.LEARNING_RATE,
-                epochs=100,
+                epochs=train_epochs,
                 layers='heads' if use_coco_weights else 'all',
                 augmentation=augmenters,
                 custom_callbacks=custom_callbacks)
+
+    if ft_train_set:
+        model.train(ft_train_set, val_set,
+                    learning_rate=config.LEARNING_RATE / 10,
+                    epochs=25,
+                    layers='all',
+                    augmentation=augmenters,
+                    custom_callbacks=custom_callbacks)
 
 
 def get_epoch_no(file_name: str) -> int:
