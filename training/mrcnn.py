@@ -77,7 +77,7 @@ def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Confi
     if ft_train_set:
         model.train(ft_train_set, val_set,
                     learning_rate=config.LEARNING_RATE / 10,
-                    epochs=25,
+                    epochs=100,
                     layers='all',
                     augmentation=augmenters,
                     custom_callbacks=custom_callbacks)
