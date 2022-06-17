@@ -59,8 +59,11 @@ def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Confi
         wandb.init(project=wandb_info[0], entity=wandb_info[1], config=wandb_config)
         custom_callbacks.append(WandbCallback())
 
+    layers = layers if use_coco_weights else 'all'
+
     print(f"Saving model to {model.log_dir}\n")
     print(f"\nAugmentation: {augment}\t Transfer Learning: {use_coco_weights}\n")
+    print(f"\nTraining layers: {layers}\n")
 
     if use_coco_weights and checkpoint_model is None:
         weights_path = COCO_WEIGHTS_PATH
@@ -72,7 +75,7 @@ def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Confi
     model.train(train_set, val_set,
                 learning_rate=config.LEARNING_RATE,
                 epochs=train_epochs,
-                layers='heads' if use_coco_weights else 'all',
+                layers=layers,
                 augmentation=augmenters,
                 custom_callbacks=custom_callbacks)
 
