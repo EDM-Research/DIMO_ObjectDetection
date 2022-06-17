@@ -7,6 +7,7 @@ parser.add_argument('action', type=str)
 parser.add_argument('--subsets', type=str, nargs='+')
 parser.add_argument('--ft_subsets', type=str, nargs='+', required=False, default=None)
 parser.add_argument('--model', type=str, default=None)
+parser.add_argument('--layers', type=str, default=None)
 parser.add_argument('--file', type=str, default=None)
 parser.add_argument('--image_counts', type=int, default=None, nargs='+')
 parser.add_argument('--ft_image_counts', type=int, default=None, nargs='+')
@@ -30,11 +31,12 @@ elif action == 'train':
     train_image_counts = args.image_counts
     transfer_learning = args.t
     model_id = args.model
+    layers = args.layers
 
     ft_subsets = args.ft_subsets
     ft_image_counts = args.ft_image_counts
     train_subsets(args.subsets, augment=augment, transfer_learning=transfer_learning, model_id=model_id,
-                  train_image_counts=train_image_counts, ft_subsets=ft_subsets, ft_image_count=ft_image_counts)
+                  train_image_counts=train_image_counts, ft_subsets=ft_subsets, ft_image_count=ft_image_counts, layers=layers)
 elif action == 'test':
     if args.file:
         test_batch(args.file)

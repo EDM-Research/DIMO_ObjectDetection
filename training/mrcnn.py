@@ -33,7 +33,9 @@ def get_model_folder():
 
 
 def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Config, use_coco_weights: bool = True,
-          augment: bool = True, checkpoint_model: modellib.MaskRCNN = None, ft_train_set: utils.Dataset = None):
+          augment: bool = True, checkpoint_model: modellib.MaskRCNN = None, ft_train_set: utils.Dataset = None, layers: str = 'heads'):
+    assert layers in ['3+', '4+', '5+', 'heads']
+
     augmenters = augmentation.augmenters if augment else None
     if checkpoint_model:
         model = checkpoint_model
