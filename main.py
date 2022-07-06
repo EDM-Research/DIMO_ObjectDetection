@@ -162,4 +162,4 @@ def test_epochs(subsets: list, models: list):
 
 
 if __name__ == "__main__":
-    test_folder("C:/Users/bvanherle/Documents/Datasets/deo/1-4DPS instruments/", "deo_005", 5, save_folder="C:/Users/bvanherle/Documents/Datasets/deo/results/005")
+    evaluation.compute_coco_ap(None, None, None)

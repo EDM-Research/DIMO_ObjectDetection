@@ -69,3 +69,11 @@ def compute_map(results: list, dataset: Dataset, config: Config, iou_threshold: 
 
     return np.mean(aps)
 
+
+def compute_coco_ap(results: list, dataset: Dataset, config: Config) -> float:
+    thresholds = np.arange(start=0.50, stop=1.0, step=0.05)
+    aps = [compute_map(results, dataset, config, threshold) for threshold in thresholds]
+
+    return np.mean(aps)
+
+
