@@ -17,6 +17,6 @@ def read_test_batch(file_path: str) -> List[ModelTest]:
 def write_test_metrics(tests: List[ModelTest], filename: str):
 
     with open(filename, 'w') as f:
-        f.write("model_id,subset,map,precision,recall\n")
+        f.write("model_id,subset,ap,ap50,ap75\n")
         for test in tests:
-            f.write(f"{test.model_id},{test.test_subset},{test.metrics['map']},{test.metrics['precision']},{test.metrics['recall']}\n")
+            f.write(f"{test.model_id},{test.test_subset},{test.metrics['ap']},{test.metrics['ap_50']},{test.metrics['ap_75']}\n")

@@ -26,7 +26,6 @@ def test_batch(batch_file: str):
     model_tests = file_io.read_test_batch(batch_file)
 
     for test in model_tests:
-        iou = 0.5
         dataset, config = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, [test.test_subset])
 
         # very ugly hack, some models were trained with two extra classes
@@ -35,8 +34,8 @@ def test_batch(batch_file: str):
 
         model = mrcnn_training.load_model(test.model_id, config)
         results = detection.get_detections_dataset(dataset, model, config)
-        ap_50 = evaluation.compute_map(results, dataset, config, iou)
-        ap_75 = evaluation.compute_map(results, dataset, config, iou)
+        ap_50 = evaluation.compute_map(results, dataset, config, 0.5)
+        ap_75 = evaluation.compute_map(results, dataset, config, 0.75)
         ap = evaluation.compute_coco_ap(results, dataset, config)
 
         test.metrics = {
