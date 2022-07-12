@@ -29,15 +29,20 @@ def test_batch(batch_file: str):
         iou = 0.5
         dataset, config = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, [test.test_subset])
 
+        # very ugly hack, some models were trained with two extra classes
+        if test.model_id in ["dimo20220212T1254"]:
+            config = data.mrcnn_dimo.DimoInferenceConfig(num_classes=dataset.num_classes+2)
+
         model = mrcnn_training.load_model(test.model_id, config)
         results = detection.get_detections_dataset(dataset, model, config)
-        map = evaluation.compute_map(results, dataset, config, iou)
-        precision, recall = evaluation.compute_mean_pand(results, dataset, config, iou)
+        ap_50 = evaluation.compute_map(results, dataset, config, iou)
+        ap_75 = evaluation.compute_map(results, dataset, config, iou)
+        ap = evaluation.compute_coco_ap(results, dataset, config)
 
         test.metrics = {
-            "map": map,
-            "precision": precision,
-            "recall": recall
+            "ap": ap,
+            "ap_50": ap_50,
+            "ap_75": ap_75,
         }
 
     filename = f"{batch_file.split('.')[0]}_results.csv"
@@ -87,17 +92,17 @@ def show_subsets(subsets: list):
 
 
 def test_subsets(subsets: list, model_id: str, save_results: bool = False):
-    iou = 0.5
     dataset, config = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, subsets)
 
     model = mrcnn_training.load_model(model_id, config)
     results = detection.get_detections_dataset(dataset, model, config)
-    map = evaluation.compute_map(results, dataset, config, iou)
-    precision, recall = evaluation.compute_mean_pand(results, dataset, config, iou)
+    ap_50 = evaluation.compute_map(results, dataset, config, iou)
+    ap_75 = evaluation.compute_map(results, dataset, config, iou)
+    ap = evaluation.compute_coco_ap(results, dataset, config)
 
-    print(f"maP @ iou = {iou} = {map}")
-    print(f"precision @ iou = {iou} = {precision}")
-    print(f"recall @ iou = {iou} = {recall}")
+    print(f"AP = {ap}")
+    print(f"AP 50 = {ap_50}")
+    print(f"AP 75 = {ap_75}")
 
     if save_results:
         visualize.save_results(results, mrcnn_dimo.get_dataset_images(dataset, config), "results/", dataset.class_names)
