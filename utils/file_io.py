@@ -34,6 +34,8 @@ def read_model_epochs(model_id: str) -> Tuple[List[Any], List[Any]]:
                 first = False
                 continue
             epoch, ap = line.rstrip().split(",")
+            epochs.append(epoch)
+            aps.append(ap)
 
     return epochs, aps
 
