@@ -1,5 +1,5 @@
 import os.path
-from typing import Tuple, List
+from typing import Tuple, List, Any
 from training.evaluation import ModelTest
 
 
@@ -21,6 +21,23 @@ def write_model_epochs(model_id: str, aps: list, epochs: list):
         f.write("epoch,ap\n")
         for epoch, ap in zip(aps, epochs):
             f.write(f"{epoch},{ap}\n")
+
+
+def read_model_epochs(model_id: str) -> Tuple[List[Any], List[Any]]:
+    filename = os.path.join('results', f"{model_id}.csv")
+    first = True
+    epochs = []
+    aps = []
+    with open(filename, 'r') as f:
+        for line in f:
+            if first:
+                first = False
+                continue
+            epoch, ap = line.rstrip().split(",")
+
+    return epochs, aps
+
+
 
 
 def write_test_metrics(tests: List[ModelTest], filename: str):

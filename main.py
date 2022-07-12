@@ -149,6 +149,8 @@ def test_epochs(subsets: list, models: list):
                 tested_epochs.append(epoch)
                 aps.append(ap)
 
+        file_io.write_model_epochs(model_id, aps, tested_epochs)
+
         results_dict[model_id] = {
             'tested_epochs': tested_epochs,
             'aps': aps
