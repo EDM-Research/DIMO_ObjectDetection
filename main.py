@@ -132,8 +132,6 @@ def test_epochs(subsets: list, models: list):
     test_frequency = 50
     dataset, config = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, subsets)
 
-    results_dict = {}
-
     for model_id in models:
         available_epochs = np.array(mrcnn_training.get_available_epochs(f"{mrcnn_training.get_model_folder()}/{model_id}"))
         test_epochs = np.arange(0, np.max(available_epochs) + 1, test_frequency).astype(np.int)
@@ -150,20 +148,6 @@ def test_epochs(subsets: list, models: list):
                 aps.append(ap)
 
         file_io.write_model_epochs(model_id, aps, tested_epochs)
-
-        results_dict[model_id] = {
-            'tested_epochs': tested_epochs,
-            'aps': aps
-        }
-
-    with plt.style.context('Solarize_Light2'):
-        for model_id in models:
-            plt.plot(results_dict[model_id]['tested_epochs'], results_dict[model_id]['aps'], label = model_id)
-
-        plt.legend()
-        plt.show()
-        plt.xlabel("Epoch")
-        plt.ylabel("AP")
 
 
 if __name__ == "__main__":
