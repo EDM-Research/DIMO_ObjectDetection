@@ -130,7 +130,6 @@ def test_folder(folder: str,  model_id: str, num_classes: int, select_roi=False,
 
 def test_epochs(subsets: list, models: list):
     test_frequency = 50
-    iou = 0.5
     dataset, config = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, subsets)
 
     results_dict = {}
@@ -140,29 +139,29 @@ def test_epochs(subsets: list, models: list):
         test_epochs = np.arange(0, np.max(available_epochs) + 1, test_frequency).astype(np.int)
         test_epochs[0] += 1
         tested_epochs = []
-        maps = []
+        aps = []
         for epoch in test_epochs:
             if epoch in available_epochs:
                 model = mrcnn_training.load_model(model_id, config, epoch)
                 results = detection.get_detections_dataset(dataset, model, config)
-                map = evaluation.compute_map(results, dataset, config, iou)
+                ap = evaluation.compute_coco_ap(results, dataset, config)
 
                 tested_epochs.append(epoch)
-                maps.append(map)
+                aps.append(ap)
 
         results_dict[model_id] = {
             'tested_epochs': tested_epochs,
-            'maps': maps
+            'aps': aps
         }
 
     with plt.style.context('Solarize_Light2'):
         for model_id in models:
-            plt.plot(results_dict[model_id]['tested_epochs'], results_dict[model_id]['maps'], label = model_id)
+            plt.plot(results_dict[model_id]['tested_epochs'], results_dict[model_id]['aps'], label = model_id)
 
         plt.legend()
         plt.show()
         plt.xlabel("Epoch")
-        plt.ylabel("mAP")
+        plt.ylabel("AP")
 
 
 if __name__ == "__main__":
