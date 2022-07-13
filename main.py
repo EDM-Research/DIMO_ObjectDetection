@@ -14,7 +14,7 @@ import configparser
 import cv2
 import numpy as np
 from training import mrcnn as mrcnn_training
-
+import tensorflow.keras.backend as K
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -129,7 +129,7 @@ def test_folder(folder: str,  model_id: str, num_classes: int, select_roi=False,
 
 
 def test_epochs(subsets: list, models: list):
-    test_frequency = 50
+    test_frequency = 2
     dataset, config = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, subsets)
 
     for model_id in models:
@@ -147,8 +147,20 @@ def test_epochs(subsets: list, models: list):
                 tested_epochs.append(epoch)
                 aps.append(ap)
 
+                del model
+                K.clear_session()
+
         file_io.write_model_epochs(model_id, aps, tested_epochs)
 
 
 if __name__ == "__main__":
-    evaluation.compute_coco_ap(None, None, None)
+    test_epochs(["real_jaigo_000-150"], [
+        "dimo20220411T1045",
+        "dimo20220530T1039",
+        "dimo20220212T1254",
+        "dimo20220214T0430",
+        "dimo20220217T1204",
+        "dimo20220705T1354",
+        "dimo20220707T0242",
+        "dimo20220708T1446"
+    ])

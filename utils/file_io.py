@@ -19,7 +19,7 @@ def write_model_epochs(model_id: str, aps: list, epochs: list):
     filename = os.path.join('results', f"{model_id}.csv")
     with open(filename, 'w') as f:
         f.write("epoch,ap\n")
-        for epoch, ap in zip(aps, epochs):
+        for epoch, ap in zip(epochs, aps):
             f.write(f"{epoch},{ap}\n")
 
 
@@ -38,8 +38,6 @@ def read_model_epochs(model_id: str) -> Tuple[List[Any], List[Any]]:
             aps.append(ap)
 
     return epochs, aps
-
-
 
 
 def write_test_metrics(tests: List[ModelTest], filename: str):
