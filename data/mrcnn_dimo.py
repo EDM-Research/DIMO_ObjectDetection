@@ -146,14 +146,24 @@ def get_dimo_datasets(path: str, subsets: List[str], train_image_counts: list = 
     return dataset_train, dataset_val, config
 
 
-def get_test_dimo_dataset(path: str, subsets: List[str]) -> Tuple[DIMODataset, DimoInferenceConfig]:
+def get_test_dimo_dataset(path: str, subsets: List[str]) -> DIMODataset:
     dataset = DIMODataset()
     dataset.load_dataset(path, subsets, split="test")
     dataset.prepare()
 
-    config = DimoInferenceConfig(len(dataset.class_ids))
+    return dataset
 
-    return dataset, config
+
+def get_test_dimo_config(dataset: DIMODataset, model_id: str) -> DimoInferenceConfig:
+    classes = len(dataset.class_ids)
+
+    # very ugly hack, some models were trained with two extra classes
+    if model_id in ["dimo20220212T1254"]:
+        classes += 2
+
+    config = DimoInferenceConfig(classes)
+
+    return config
 
 
 def get_dataset_images(dataset: DIMODataset, config: config.Config):

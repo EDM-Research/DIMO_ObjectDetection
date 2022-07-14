@@ -26,11 +26,8 @@ def test_batch(batch_file: str):
     model_tests = file_io.read_test_batch(batch_file)
 
     for test in model_tests:
-        dataset, config = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, [test.test_subset])
-
-        # very ugly hack, some models were trained with two extra classes
-        if test.model_id in ["dimo20220212T1254"]:
-            config = data.mrcnn_dimo.DimoInferenceConfig(num_classes=dataset.num_classes+2)
+        dataset = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, [test.test_subset])
+        config = data.mrcnn_dimo.get_test_dimo_config(dataset, test.model_id)
 
         model = mrcnn_training.load_model(test.model_id, config)
         results = detection.get_detections_dataset(dataset, model, config)
@@ -91,12 +88,13 @@ def show_subsets(subsets: list):
 
 
 def test_subsets(subsets: list, model_id: str, save_results: bool = False):
-    dataset, config = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, subsets)
+    dataset = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, subsets)
+    config = data.mrcnn_dimo.get_test_dimo_config(dataset, model_id)
 
     model = mrcnn_training.load_model(model_id, config)
     results = detection.get_detections_dataset(dataset, model, config)
-    ap_50 = evaluation.compute_map(results, dataset, config, iou)
-    ap_75 = evaluation.compute_map(results, dataset, config, iou)
+    ap_50 = evaluation.compute_map(results, dataset, config, 0.5)
+    ap_75 = evaluation.compute_map(results, dataset, config, 0.75)
     ap = evaluation.compute_coco_ap(results, dataset, config)
 
     print(f"AP = {ap}")
@@ -130,9 +128,10 @@ def test_folder(folder: str,  model_id: str, num_classes: int, select_roi=False,
 
 def test_epochs(subsets: list, models: list):
     test_frequency = 2
-    dataset, config = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, subsets)
+    dataset = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, subsets)
 
     for model_id in models:
+        config = data.mrcnn_dimo.get_test_dimo_config(dataset, model_id)
         available_epochs = np.array(mrcnn_training.get_available_epochs(f"{mrcnn_training.get_model_folder()}/{model_id}"))
         test_epochs = np.arange(0, np.max(available_epochs) + 1, test_frequency).astype(np.int)
         test_epochs[0] += 1
