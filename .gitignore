@@ -140,4 +140,5 @@ wandb/
 weights/
 models/
 results/
+plots/
 config.ini
