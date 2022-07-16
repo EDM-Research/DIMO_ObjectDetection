@@ -1,6 +1,8 @@
 import configparser
 import random
 
+import cv2
+
 from mrcnn import utils, visualize, config, model
 from data.dimo_loader import DimoLoader
 from pathlib import Path
@@ -114,11 +116,14 @@ class DIMODataset(utils.Dataset):
     def load_mask(self, image_id):
         image_info = self.image_info[image_id]
         mask_0 = skimage.io.imread(image_info["instance_masks"][0])
+        _, mask_0 = cv2.threshold(mask_0, 127,255, cv2.THRESH_BINARY)
         masks = np.zeros((mask_0.shape[0], mask_0.shape[1], len(image_info['instance_ids'])))
         masks[:, :, 0] = mask_0
 
         for object_no, mask_path in enumerate(image_info["instance_masks"][1:]):
-            masks[:, :, object_no+1] = skimage.io.imread(mask_path)
+            mask = skimage.io.imread(mask_path)
+            _, mask = cv2.threshold(mask, 127, 255, cv2.THRESH_BINARY)
+            masks[:, :, object_no+1] = mask
         return masks.astype(np.uint8), np.array(image_info["instance_ids"], dtype=np.int32)
 
     def image_reference(self, image_id):
