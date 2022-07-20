@@ -169,16 +169,16 @@ def experiment_2_epoch():
     import file_io
 
     models = [
-        "dimo20220415T0810",
-        "dimo20220417T1814",
-        "dimo20220210T0254",
-        "dimo20220217T0257",
-        "dimo20220222T1437",
-        "dimo20220419T1045",
-        "dimo20220420T1506",
-        "dimo20220422T0919",
-        "dimo20220424T2051",
-        "dimo20220426T1027"
+        "dimo20220415T0810", # aug
+        "dimo20220417T1814", # aug
+        "dimo20220210T0254", # aug
+        "dimo20220217T0257", # aug
+        "dimo20220222T1437", # aug
+        "dimo20220419T1045", # tl
+        "dimo20220420T1506", # tl
+        "dimo20220422T0919", # tl
+        "dimo20220424T2051", # tl
+        "dimo20220426T1027" # tl
     ]
 
     labels = [
@@ -195,16 +195,8 @@ def experiment_2_epoch():
     ]
 
     colors = [
-        "#E24A33",
-        "#348ABD",
-        "#988ED5",
-        "#777777",
-        "#FBC15E",
-        "#E24A33",
-        "#348ABD",
-        "#988ED5",
-        "#777777",
-        "#FBC15E"
+        "#E24A33", "#348ABD", "#988ED5", "#777777", "#FBC15E",
+        "#E24A33", "#348ABD", "#988ED5", "#777777", "#FBC15E"
     ]
 
     lines = [
@@ -212,7 +204,7 @@ def experiment_2_epoch():
         ":", ":", ":", ":", ":"
     ]
 
-    fig, ax = plt.subplots(figsize=(8, 4))
+    fig, ax = plt.subplots()
 
     for model_id, label, color, line in zip(models, labels, colors, lines):
         epochs, aps = file_io.read_model_epochs(model_id)
