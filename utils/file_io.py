@@ -24,7 +24,7 @@ def write_model_epochs(model_id: str, aps: list, epochs: list):
 
 
 def read_model_epochs(model_id: str) -> Tuple[List[Any], List[Any]]:
-    filename = os.path.join('results', f"{model_id}.csv")
+    filename = os.path.join('../results', f"{model_id}.csv")
     first = True
     epochs = []
     aps = []
@@ -34,8 +34,8 @@ def read_model_epochs(model_id: str) -> Tuple[List[Any], List[Any]]:
                 first = False
                 continue
             epoch, ap = line.rstrip().split(",")
-            epochs.append(epoch)
-            aps.append(ap)
+            epochs.append(int(epoch))
+            aps.append(float(ap) * 100)
 
     return epochs, aps
 
