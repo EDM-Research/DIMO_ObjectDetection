@@ -163,4 +163,4 @@ def compare_feature_maps(subsets: list, model_id: str):
 
 
 if __name__ == "__main__":
-    compare_feature_maps(["real_jaigo_000-150"], "model")
+    compare_feature_maps(["real_jaigo_000-150"], "dimo20220411T1045")

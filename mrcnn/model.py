@@ -2071,11 +2071,14 @@ class MaskRCNN(object):
 
     def get_feature_detector(self):
         return K.function(
-            [self.keras_model.get_layer("input_image")],
-            [self.keras_model.get_layer("fpn_p2"),
-             self.keras_model.get_layer("fpn_p3"),
-             self.keras_model.get_layer("fpn_p4"),
-             self.keras_model.get_layer("fpn_p5")
+            [self.keras_model.get_layer("input_image").input,
+             self.keras_model.get_layer("input_image_meta").input,
+             self.keras_model.get_layer("input_anchors").input
+             ],
+            [self.keras_model.get_layer("fpn_p2").output,
+             self.keras_model.get_layer("fpn_p3").output,
+             self.keras_model.get_layer("fpn_p4").output,
+             self.keras_model.get_layer("fpn_p5").output
              ])
 
     def find_last(self):
