@@ -153,13 +153,13 @@ def test_epochs(subsets: list, models: list):
 
 
 if __name__ == "__main__":
-    test_epochs(["real_jaigo_000-150"], [
-        "dimo20220411T1045",
-        "dimo20220530T1039",
+    """test_epochs(["real_jaigo_000-150"], [
         "dimo20220212T1254",
         "dimo20220214T0430",
         "dimo20220217T1204",
         "dimo20220705T1354",
         "dimo20220707T0242",
         "dimo20220708T1446"
-    ])
+    ])"""
+
+    show_subsets(["lofi_reflect"])
