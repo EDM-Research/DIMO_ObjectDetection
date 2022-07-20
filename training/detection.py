@@ -26,3 +26,17 @@ def get_detections_images(images: list, model: modellib.MaskRCNN) -> list:
         results.append(result)
 
     return results
+
+
+def get_feature_maps(dataset: Dataset, model: modellib.MaskRCNN, config: Config) -> list:
+    feature_detector = model.get_feature_detector()
+    features = []
+
+    for i, image_id in enumerate(dataset.image_ids):
+        print(f"Testing image {i}/{len(dataset.image_ids)}", end='\r')
+        image, *_ = modellib.load_image_gt(dataset, config, image_id)
+        output = feature_detector([image])
+
+        features.append(output)
+
+    return features

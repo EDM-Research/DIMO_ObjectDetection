@@ -152,14 +152,15 @@ def test_epochs(subsets: list, models: list):
         file_io.write_model_epochs(model_id, aps, tested_epochs)
 
 
-if __name__ == "__main__":
-    """test_epochs(["real_jaigo_000-150"], [
-        "dimo20220212T1254",
-        "dimo20220214T0430",
-        "dimo20220217T1204",
-        "dimo20220705T1354",
-        "dimo20220707T0242",
-        "dimo20220708T1446"
-    ])"""
+def compare_feature_maps(subsets: list, model_id: str):
+    dataset = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, subsets)
+    config = data.mrcnn_dimo.get_test_dimo_config(dataset, model_id)
 
-    show_subsets(["lofi_reflect"])
+    model = mrcnn_training.load_model(model_id, config)
+
+    features = detection.get_feature_maps(dataset, model, config)
+
+
+
+if __name__ == "__main__":
+    compare_feature_maps(["real_jaigo_000-150"], "model")
