@@ -15,6 +15,7 @@ import cv2
 import numpy as np
 from training import mrcnn as mrcnn_training
 import tensorflow.keras.backend as K
+from utils import plotting
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -152,15 +153,25 @@ def test_epochs(subsets: list, models: list):
         file_io.write_model_epochs(model_id, aps, tested_epochs)
 
 
-def compare_feature_maps(subsets: list, model_id: str):
-    dataset = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, subsets)
-    config = data.mrcnn_dimo.get_test_dimo_config(dataset, model_id)
+def compare_feature_maps(model_id: str):
+    embeddings = []
+    subsets = ["real_jaigo_000-150", "sim_jaigo_real_light_real_pose"]
+    titles = ["real", "synth"]
 
-    model = mrcnn_training.load_model(model_id, config)
+    for set in subsets:
+        dataset, val, _ = data.mrcnn_dimo.get_dimo_datasets(DIMO_PATH, [set], train_image_counts=[500])
+        config = data.mrcnn_dimo.get_test_dimo_config(dataset, model_id)
 
-    features = detection.get_feature_maps(dataset, model, config)
+        model = mrcnn_training.load_model(model_id, config)
 
+        embedding = detection.get_umap(dataset, model, config, level=0)
+        embeddings.append(embedding)
+
+        del model
+        K.clear_session()
+
+    plotting.plot_feature_maps(embeddings, titles)
 
 
 if __name__ == "__main__":
-    compare_feature_maps(["real_jaigo_000-150"], "dimo20220411T1045")
+    compare_feature_maps("dimo20220411T1045")

@@ -1,6 +1,9 @@
+from typing import List
+
 import numpy as np
 from matplotlib import pyplot as plt
 import matplotlib
+import umap
 
 plt.style.use("ggplot")
 
@@ -298,6 +301,15 @@ def experiment_5():
     plt.show()
 
     fig.savefig('../plots/exp5.png', dpi=300)
+
+
+def plot_feature_maps(embeddings: List[np.array], titles: list = None):
+    titles = list(map(str, range(len(embeddings)))) if titles is None else titles
+
+    for embedding, title in zip(embeddings, titles):
+        plt.scatter(embedding[:,0], embedding[:,1], label=title)
+
+    plt.show()
 
 
 if __name__ == "__main__":

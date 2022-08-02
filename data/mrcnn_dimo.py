@@ -151,9 +151,9 @@ def get_dimo_datasets(path: str, subsets: List[str], train_image_counts: list = 
     return dataset_train, dataset_val, config
 
 
-def get_test_dimo_dataset(path: str, subsets: List[str]) -> DIMODataset:
+def get_test_dimo_dataset(path: str, subsets: List[str], image_counts: list = None) -> DIMODataset:
     dataset = DIMODataset()
-    dataset.load_dataset(path, subsets, split="test")
+    dataset.load_dataset(path, subsets, split="test", image_counts=image_counts)
     dataset.prepare()
 
     return dataset
