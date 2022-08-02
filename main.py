@@ -159,7 +159,7 @@ def compare_feature_maps(model_id: str):
     titles = ["real", "synth"]
 
     for set in subsets:
-        dataset, val, _ = data.mrcnn_dimo.get_dimo_datasets(DIMO_PATH, [set], train_image_counts=[500])
+        dataset, val, _ = data.mrcnn_dimo.get_dimo_datasets(DIMO_PATH, [set], train_image_counts=[1755])
         config = data.mrcnn_dimo.get_test_dimo_config(dataset, model_id)
 
         model = mrcnn_training.load_model(model_id, config)

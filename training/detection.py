@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 import umap
 
@@ -31,10 +33,21 @@ def get_detections_images(images: list, model: modellib.MaskRCNN) -> list:
     return results
 
 
+def run_feature_detector(feature_detector, model, image):
+    molded_images, image_metas, windows = model.mold_inputs([image])
+    image_shape = molded_images[0].shape
+    anchors = model.get_anchors(image_shape)
+    anchors = np.broadcast_to(anchors, (model.config.BATCH_SIZE,) + anchors.shape)
+
+    output = feature_detector([molded_images, image_metas, anchors])
+
+    return output
+
+
 def get_umap(dataset: Dataset, model: modellib.MaskRCNN, config: Config, level: int = 0) -> np.array:
     assert 0 <= level <= 3
-    umap_train_sample = 5
-    total_samples = 10
+    umap_train_sample = 200
+    total_samples = 1755
 
     feature_detector = model.get_feature_detector()
     features = []
@@ -42,37 +55,36 @@ def get_umap(dataset: Dataset, model: modellib.MaskRCNN, config: Config, level: 
     ids = dataset.image_ids
     np.random.shuffle(ids)
 
+    print("Computing features for training")
     for i, image_id in enumerate(ids[:umap_train_sample]):
-        print(f"\rTraining on image {i}/{umap_train_sample}", end='')
+        print(f"\rComputing image {i}/{len(ids[:umap_train_sample])}", end='')
         image, *_ = modellib.load_image_gt(dataset, config, image_id)
-        molded_images, image_metas, windows = model.mold_inputs([image])
-        image_shape = molded_images[0].shape
-        anchors = model.get_anchors(image_shape)
-        anchors = np.broadcast_to(anchors, (model.config.BATCH_SIZE,) + anchors.shape)
-
-        output = feature_detector([molded_images, image_metas, anchors])[level]
+        output = run_feature_detector(feature_detector, model, image)[level]
 
         features.append(output.flatten())
 
+    print("\nTraining model")
     features = np.array(features)
     reducer = umap.UMAP()
     reducer.fit(features)
 
-    features = []
-    for i, image_id in enumerate(ids[umap_train_sample:total_samples]):
-        print(f"Computing for image {i}/{total_samples - umap_train_sample}", end='\r')
+    embeddings = reducer.embedding_
 
-        image, *_ = modellib.load_image_gt(dataset, config, image_id)
-        molded_images, image_metas, windows = model.mold_inputs([image])
-        image_shape = molded_images[0].shape
-        anchors = model.get_anchors(image_shape)
-        anchors = np.broadcast_to(anchors, (model.config.BATCH_SIZE,) + anchors.shape)
+    print("Computing embeddings for other images")
+    batch_count = math.ceil(len(ids[umap_train_sample:total_samples]) / umap_train_sample)
+    for batch_no in range(batch_count):
+        print(f"Computing features for batch {batch_no}")
+        features = []
 
-        output = feature_detector([molded_images, image_metas, anchors])[level].flatten()
-        features.append(output.flatten())
+        for i, image_id in enumerate(ids[umap_train_sample + batch_no * umap_train_sample:min(umap_train_sample + (batch_no + 1) * umap_train_sample, len(ids))]):
+            image, *_ = modellib.load_image_gt(dataset, config, image_id)
+            print(f"\rComputing image {i}/{len(ids[umap_train_sample + batch_no * umap_train_sample:min(umap_train_sample + (batch_no + 1) * umap_train_sample, len(ids))])}", end='')
+            output = run_feature_detector(feature_detector, model, image)[level]
+            features.append(output.flatten())
 
-    embedding = reducer.transform(np.array(features))
+        print(f"Computing embeddings for batch {batch_no}")
+        embedding = reducer.transform(np.array(features))
 
-    embeddings = np.concatenate((reducer.embedding_, embedding))
+        embeddings = np.concatenate((embedding, embeddings))
 
     return embeddings
