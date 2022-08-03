@@ -303,12 +303,18 @@ def experiment_5():
     fig.savefig('../plots/exp5.png', dpi=300)
 
 
-def plot_feature_maps(embeddings: List[np.array], titles: list = None):
-    titles = list(map(str, range(len(embeddings)))) if titles is None else titles
+def plot_feature_maps(embeddings_per_level: List[np.array], titles: list = None):
+    titles = list(map(str, range(len(embeddings_per_level[0])))) if titles is None else titles
 
-    for embedding, title in zip(embeddings, titles):
-        plt.scatter(embedding[:,0], embedding[:,1], label=title)
+    fig, ax = plt.subplots(1, len(embeddings_per_level), figsize=(10,4))
 
+    for i, level_embeddings in enumerate(embeddings_per_level):
+        for embedding, title in zip(level_embeddings, titles):
+            ax[i].scatter(embedding[:,0], embedding[:,1], label=title)
+            ax[i].set_title(f"Level {i}")
+
+    ax[-1].legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    fig.tight_layout()
     plt.show()
 
 

@@ -154,24 +154,27 @@ def test_epochs(subsets: list, models: list):
 
 
 def compare_feature_maps(model_id: str):
-    embeddings = []
-    subsets = ["real_jaigo_000-150", "sim_jaigo_real_light_real_pose"]
-    titles = ["real", "synth"]
+    embeddings_per_level = []
+    subsets = ["real_jaigo_000-150", "sim_jaigo_real_light_real_pose", "sim_jaigo_real_light_rand_pose", "sim_jaigo_rand_light_real_pose", "sim_jaigo_rand_light_rand_pose"]
+    titles = ["real", "synth", "synth, rand pose", "synth, rand light", "synth, rand all"]
 
-    for set in subsets:
-        dataset, val, _ = data.mrcnn_dimo.get_dimo_datasets(DIMO_PATH, [set], train_image_counts=[1755])
-        config = data.mrcnn_dimo.get_test_dimo_config(dataset, model_id)
+    for level in range(4):
+        embeddings = []
+        for set in subsets:
+            dataset, val, _ = data.mrcnn_dimo.get_dimo_datasets(DIMO_PATH, [set], train_image_counts=[1755])
+            config = data.mrcnn_dimo.get_test_dimo_config(dataset, model_id)
 
-        model = mrcnn_training.load_model(model_id, config)
+            model = mrcnn_training.load_model(model_id, config)
 
-        embedding = detection.get_umap(dataset, model, config, level=0)
-        embeddings.append(embedding)
+            embedding = detection.get_umap(dataset, model, config, level=level)
+            embeddings.append(embedding)
 
-        del model
-        K.clear_session()
+            del model
+            K.clear_session()
+        embeddings_per_level.append(embeddings)
 
-    plotting.plot_feature_maps(embeddings, titles)
+    plotting.plot_feature_maps(embeddings_per_level, titles)
 
 
 if __name__ == "__main__":
-    compare_feature_maps("dimo20220411T1045")
+    compare_feature_maps("dimo20220419T1045")

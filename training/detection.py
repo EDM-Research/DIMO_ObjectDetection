@@ -65,7 +65,7 @@ def get_umap(dataset: Dataset, model: modellib.MaskRCNN, config: Config, level: 
 
     print("\nTraining model")
     features = np.array(features)
-    reducer = umap.UMAP()
+    reducer = umap.UMAP(random_state=10)
     reducer.fit(features)
 
     embeddings = reducer.embedding_
