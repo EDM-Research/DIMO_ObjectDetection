@@ -177,4 +177,4 @@ def compare_feature_maps(model_id: str):
 
 
 if __name__ == "__main__":
-    compare_feature_maps("dimo20220419T1045")
+    compare_feature_maps("dimo20220708T1446")
