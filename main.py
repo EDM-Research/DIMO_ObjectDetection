@@ -47,7 +47,8 @@ def test_batch(batch_file: str):
 
 
 def train_subsets(subsets: list, model_id: str = None, augment: bool = False, transfer_learning: bool = False,
-                  train_image_counts: list = None, ft_subsets: list = None, ft_image_count: int = None, layers: str = None):
+                  train_image_counts: list = None, ft_subsets: list = None, ft_image_count: int = None, layers: str = None, save_all: bool = False):
+
     # load training set
     train, val, config = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets, train_image_counts=train_image_counts)
 
@@ -65,7 +66,7 @@ def train_subsets(subsets: list, model_id: str = None, augment: bool = False, tr
     model = mrcnn_training.load_model(model_id, config, mode="training") if model_id else None
     layers = layers if layers else 'heads'
     # train model
-    mrcnn_training.train(train, val, config, augment=augment, use_coco_weights=transfer_learning, checkpoint_model=model, ft_train_set=ft_train, layers=layers)
+    mrcnn_training.train(train, val, config, augment=augment, use_coco_weights=transfer_learning, checkpoint_model=model, ft_train_set=ft_train, layers=layers, save_all=save_all)
 
 
 def prepare_subsets(subsets: list, override: bool = False, split_scenes: bool = False):

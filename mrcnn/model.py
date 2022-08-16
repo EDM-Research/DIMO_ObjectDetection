@@ -2282,7 +2282,7 @@ class MaskRCNN(object):
             "*epoch*", "{epoch:04d}")
 
     def train(self, train_dataset, val_dataset, learning_rate, epochs, layers,
-              augmentation=None, custom_callbacks=None, no_augmentation_sources=None):
+              augmentation=None, custom_callbacks=None, no_augmentation_sources=None, save_all: bool = True):
         """Train the model.
         train_dataset, val_dataset: Training and validation Dataset objects.
         learning_rate: The learning rate to train with
@@ -2343,10 +2343,12 @@ class MaskRCNN(object):
         # Callbacks
         callbacks = [
             keras.callbacks.TensorBoard(log_dir=self.log_dir,
-                                        histogram_freq=0, write_graph=True, write_images=False),
-            keras.callbacks.ModelCheckpoint(self.checkpoint_path,
-                                            verbose=0, save_weights_only=True),
+                                        histogram_freq=0, write_graph=True, write_images=False)
         ]
+
+        if save_all:
+            callbacks.append(keras.callbacks.ModelCheckpoint(self.checkpoint_path,
+                                            verbose=0, save_weights_only=True))
 
         # Add custom callbacks to the list
         if custom_callbacks:
@@ -2379,6 +2381,9 @@ class MaskRCNN(object):
             use_multiprocessing=workers > 1,
         )
         self.epoch = max(self.epoch, epochs)
+
+        if not save_all:
+            self.keras_model.save_weights(self.checkpoint_path.format(epoch=self.epoch))
 
     def mold_inputs(self, images):
         """Takes a list of images and modifies them to the format expected

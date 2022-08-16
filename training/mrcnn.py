@@ -33,7 +33,7 @@ def get_model_folder():
 
 
 def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Config, use_coco_weights: bool = True,
-          augment: bool = True, checkpoint_model: modellib.MaskRCNN = None, ft_train_set: utils.Dataset = None, layers: str = 'heads'):
+          augment: bool = True, checkpoint_model: modellib.MaskRCNN = None, ft_train_set: utils.Dataset = None, layers: str = 'heads', save_all: bool = True):
     assert layers in ['3+', '4+', '5+', 'heads', 'all']
 
     augmenters = augmentation.augmenters if augment else None
@@ -77,7 +77,8 @@ def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Confi
                 epochs=train_epochs,
                 layers=layers,
                 augmentation=augmenters,
-                custom_callbacks=custom_callbacks)
+                custom_callbacks=custom_callbacks,
+                save_all=save_all)
 
     if ft_train_set:
         model.train(ft_train_set, val_set,
@@ -85,7 +86,8 @@ def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Confi
                     epochs=100,
                     layers='all',
                     augmentation=augmenters,
-                    custom_callbacks=custom_callbacks)
+                    custom_callbacks=custom_callbacks,
+                    save_all=save_all)
 
 
 def get_epoch_no(file_name: str) -> int:
