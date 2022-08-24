@@ -11,15 +11,10 @@ First clone the repo using
 
      pip install -r requirements.txt
 
-This repository contains modified versions of [BOP tookit](https://github.com/thodan/bop_toolkit) and [DIMO Loader](https://github.com/pderoovere/dimo), these should not be downloaded separately.
-
-To train and run object detection [Matterport's MaskRCNN](https://github.com/matterport/Mask_RCNN) is used. The original version only supports Tensorflow 1.x.
-If you have a more recent GPU with the Ampere architecture (GTX 3090) you can not use TF 1.x as does not support cuda 11.
-If you are running tf 2.x you can use [this modified version](https://github.com/akTwelve/Mask_RCNN) of Matterport MaskRCNN.
-
-To install either of those versions:
-- Download the MaskRCNN repository
-- Place the `maskrcnn` folder in the root of  this repository
+This repository contains modified versions:
+- [BOP tookit](https://github.com/thodan/bop_toolkit)
+- [DIMO Loader](https://github.com/pderoovere/dimo)
+- [This modified version](https://github.com/akTwelve/Mask_RCNN) of [Matterport's MaskRCNN](https://github.com/matterport/Mask_RCNN).
 
 ## Dataset
 
@@ -27,10 +22,13 @@ Create a file named `config.ini` with the following contents:
 ```
 [USER_SETTINGS]
 dimo_path = **dimo path**
+model_folder = **folder where trained models are saved**
 images_per_gpu = 1 **increase this depending on GPU memory**
 ```
 Download the [DIMO dataset](https://github.com/pderoovere/dimo) base and the desired subsets.
 Set the `DIMO_PATH` in `config.ini` to the download location.
+
+This repository also works with other datasets in BOP format.
 
 ## Use
 
@@ -57,9 +55,17 @@ python dimo_detection.py train --subsets subset1 subsets2
 ```
 The following flags can be used:
 - `-a` If this flag is set data augmentations will be applied during training. These are found in `training/augmentation.py`
-- `-t` The model will be initialized with weights pretrained on COCO. Only the heads will be trained, the ResNet layers are frozen.
-- `--model` Specify the model id and training will resume from the last checkpoint of that model. The id is the name of the folder the checkpoints are saved in.
-Trained models will be placed in the `models` folder. Training progress can be visualised with tensorboard:
+- `-t` The model will be initialized with weights pretrained on COCO. By default, only the heads will be trained, the ResNet layers are frozen.
+- `--layers [layer_name]` Specify which layers of the model are trained. This can either be `all`, `heads`, `3+`, `4+` or `5+`, corresponding to the ResNet stages that will be trained. This defaults to `all`, unless the `-t` flag is supplied.
+- `--save_all` Save the model after each epoch.
+- `--model [model_id]` Specify the model id and training will resume from the last checkpoint of that model. The id is the name of the folder the checkpoints are saved in. Checkpoints are only available for models trained with `--save_all`.
+- `--image_counts [count_1, count_2, ..]` Optionally specify the amount of images to use from each dataset, by default all images are used.
+- `--ft_subsets [subset1, subset2, ..]` Optionally specify what subsets to finetune on. All layers are trained for 25 epochs at a lower LR during finetuning.
+- `--ft_image_counts [count_1, count_2, ..]` Optionally specify how many images to use from the finetune datasets
+
+Trained models will be placed in the `models_folder` from the config.
+
+Training progress can be visualised with tensorboard:
 ```
 tensorboard --logdir models/
 ```
