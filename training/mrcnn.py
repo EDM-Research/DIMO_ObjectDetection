@@ -75,7 +75,7 @@ def train(train_set: DIMODataset, val_set: DIMODataset, config: config.Config, u
             utils.download_trained_weights(weights_path)
         model.load_weights(weights_path, by_name=True, exclude=["mrcnn_class_logits", "mrcnn_bbox_fc", "mrcnn_bbox", "mrcnn_mask"])
 
-    train_epochs = 75 if ft_train_set else 1
+    train_epochs = 75 if ft_train_set else 100
     model.train(train_set, val_set,
                 learning_rate=config.LEARNING_RATE,
                 epochs=train_epochs,
