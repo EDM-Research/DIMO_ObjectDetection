@@ -1,0 +1,1 @@
+Train MRCNN on real_jaigo_000-150  Train images:1755 Finetuned on:none Layers:headsD:/Models/DIMO\dimo20220830T1106

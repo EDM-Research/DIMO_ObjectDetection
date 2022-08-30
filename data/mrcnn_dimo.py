@@ -16,7 +16,7 @@ class DimoConfig(config.Config):
     NAME = "dimo"
     IMAGES_PER_GPU = 4
     USE_MINI_MASK = True
-    STEPS_PER_EPOCH = 1000
+    STEPS_PER_EPOCH = 1
     TRAIN_ROIS_PER_IMAGE = 50
     LEARNING_RATE = 0.001
     NUM_CLASSES = 8 + 1

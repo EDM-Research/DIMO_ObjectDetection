@@ -68,11 +68,12 @@ def train_subsets(subsets: list, model_id: str = None, augment: bool = False, tr
     model = mrcnn_training.load_model(model_id, config, mode="training") if model_id else None
     layers = layers if layers else 'heads'
     # train model
-    mrcnn_training.train(train, val, config, augment=augment, use_coco_weights=transfer_learning, checkpoint_model=model, ft_train_set=ft_train, layers=layers, save_all=save_all)
+    log_dir = mrcnn_training.train(train, val, config, augment=augment, use_coco_weights=transfer_learning, checkpoint_model=model, ft_train_set=ft_train, layers=layers, save_all=save_all)
 
     log_string = f"Train MRCNN on {'+'.join(subsets)} {'aug' if augment else ''} {'tl' if transfer_learning else ''}Train images:{len(train.image_ids)} Finetuned on:{'+'.join(ft_subsets) if ft_subsets else 'none'} Layers:{layers}"
     with open(logfile, 'w+') as f:
         f.write(log_string)
+        f.write(log_dir)
         f.write("\n")
 
 

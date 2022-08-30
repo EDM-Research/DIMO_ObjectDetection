@@ -1,4 +1,19 @@
 
-python dimo_detection.py train --subsets sim_jaigo_rand_light_real_pose --image_counts 1755
-python dimo_detection.py train --subsets sim_jaigo_real_light_rand_pose --image_counts 1755
-python dimo_detection.py train --subsets sim_jaigo_rand_light_rand_pose --image_counts 1755
+python dimo_detection.py train --subsets sim_jaigo_rand_light_real_pose -t -a --image_counts 100
+python dimo_detection.py train --subsets sim_jaigo_rand_light_real_pose -t -a --image_counts 200
+python dimo_detection.py train --subsets sim_jaigo_rand_light_real_pose -t -a --image_counts 400
+python dimo_detection.py train --subsets sim_jaigo_rand_light_real_pose -t -a --image_counts 800
+python dimo_detection.py train --subsets sim_jaigo_rand_light_real_pose -t -a --image_counts 1600
+python dimo_detection.py train --subsets sim_jaigo_rand_light_real_pose -t -a --image_counts 3200
+python dimo_detection.py train --subsets sim_jaigo_rand_light_real_pose -t -a --image_counts 6400
+python dimo_detection.py train --subsets sim_jaigo_rand_light_real_pose -t -a --image_counts 12800
+python dimo_detection.py train --subsets sim_jaigo_rand_light_real_pose -t -a --image_counts 25600
+
+python dimo_detection.py train --subsets sim_jaigo_real_light_rand_pose -t -a --image_counts 200
+python dimo_detection.py train --subsets sim_jaigo_real_light_rand_pose -t -a --image_counts 400
+python dimo_detection.py train --subsets sim_jaigo_real_light_rand_pose -t -a --image_counts 800
+python dimo_detection.py train --subsets sim_jaigo_real_light_rand_pose -t -a --image_counts 1600
+python dimo_detection.py train --subsets sim_jaigo_real_light_rand_pose -t -a --image_counts 3200
+python dimo_detection.py train --subsets sim_jaigo_real_light_rand_pose -t -a --image_counts 6400
+python dimo_detection.py train --subsets sim_jaigo_real_light_rand_pose -t -a --image_counts 12800
+python dimo_detection.py train --subsets sim_jaigo_real_light_rand_pose -t -a --image_counts 25600

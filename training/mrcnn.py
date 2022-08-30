@@ -71,7 +71,7 @@ def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Confi
             utils.download_trained_weights(weights_path)
         model.load_weights(weights_path, by_name=True, exclude=["mrcnn_class_logits", "mrcnn_bbox_fc", "mrcnn_bbox", "mrcnn_mask"])
 
-    train_epochs = 75 if ft_train_set else 100
+    train_epochs = 75 if ft_train_set else 1
     model.train(train_set, val_set,
                 learning_rate=config.LEARNING_RATE,
                 epochs=train_epochs,
@@ -88,6 +88,8 @@ def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Confi
                     augmentation=augmenters,
                     custom_callbacks=custom_callbacks,
                     save_all=save_all)
+
+    return model.log_dir
 
 
 def get_epoch_no(file_name: str) -> int:
