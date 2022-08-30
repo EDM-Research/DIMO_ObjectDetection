@@ -1,3 +1,4 @@
+from data.mrcnn_dimo import DIMODataset
 from mrcnn import config, utils, model as modellib
 from training import augmentation
 import os
@@ -32,8 +33,8 @@ def get_model_folder():
         return 'models'
 
 
-def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Config, use_coco_weights: bool = True,
-          augment: bool = True, checkpoint_model: modellib.MaskRCNN = None, ft_train_set: utils.Dataset = None, layers: str = 'heads', save_all: bool = True):
+def train(train_set: DIMODataset, val_set: DIMODataset, config: config.Config, use_coco_weights: bool = True,
+          augment: bool = True, checkpoint_model: modellib.MaskRCNN = None, ft_train_set: DIMODataset = None, layers: str = 'heads', save_all: bool = True):
     assert layers in ['3+', '4+', '5+', 'heads', 'all']
 
     augmenters = augmentation.augmenters if augment else None
@@ -61,9 +62,12 @@ def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Confi
 
     layers = layers if use_coco_weights else 'all'
 
-    print(f"Saving model to {model.log_dir}\n")
-    print(f"\nAugmentation: {augment}\t Transfer Learning: {use_coco_weights}\n")
-    print(f"\nTraining layers: {layers}\n")
+    logging.info(f"Training model {model.log_dir}")
+    logging.info(f"\tTraining on {'+'.join(train_set.subsets)}")
+    logging.info(f"\tTraining images: {train_set.num_images}")
+    logging.info(f"\tAugmentation: {augment})")
+    logging.info(f"\tTransfer Learning: {use_coco_weights}\n")
+    logging.info(f"\tTraining layers: {layers}\n")
 
     if use_coco_weights and checkpoint_model is None:
         weights_path = COCO_WEIGHTS_PATH
@@ -81,6 +85,8 @@ def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Confi
                 save_all=save_all)
 
     if ft_train_set:
+        logging.info(f"\tFinetuning on {'+'.join(ft_train_set.subsets)}")
+        logging.info(f"\tFintuning on images: {ft_train_set.num_images}")
         model.train(ft_train_set, val_set,
                     learning_rate=config.LEARNING_RATE / 10,
                     epochs=100,
@@ -88,8 +94,6 @@ def train(train_set: utils.Dataset, val_set: utils.Dataset, config: config.Confi
                     augmentation=augmenters,
                     custom_callbacks=custom_callbacks,
                     save_all=save_all)
-
-    return model.log_dir
 
 
 def get_epoch_no(file_name: str) -> int:

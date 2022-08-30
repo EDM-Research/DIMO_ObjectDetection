@@ -1,11 +1,7 @@
-import skimage
-from matplotlib import pyplot as plt
-
 import data.mrcnn_dimo
 from data import utils as data_utils
 from data import mrcnn_dimo
 import os, random
-from mrcnn import utils as mrcnn_utils
 from mrcnn import visualize as mrcnn_visualise
 from mrcnn import model as modellib
 from training import evaluation, detection
@@ -16,13 +12,16 @@ import numpy as np
 from training import mrcnn as mrcnn_training
 import tensorflow.keras.backend as K
 from utils import plotting
+import logging
 
 config = configparser.ConfigParser()
 config.read('config.ini')
 
 DIMO_PATH = config['USER_SETTINGS']['dimo_path']
 
+
 logfile = "log.txt"
+logging.basicConfig(filename=logfile, encoding='utf-8')
 
 
 def test_batch(batch_file: str):
@@ -54,27 +53,16 @@ def train_subsets(subsets: list, model_id: str = None, augment: bool = False, tr
     # load training set
     train, val, config = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets, train_image_counts=train_image_counts)
 
-    print(f"training images: {len(train.image_ids)}")
-    print(f"validation images: {len(val.image_ids)}")
-
     # if specified, load fintuning dataset
     ft_train = None
     if ft_subsets:
         ft_train, _, _ = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, ft_subsets, train_image_counts=ft_image_count)
 
-        print(f"finetuning images: {len(ft_train.image_ids)}")
-
     # load model to continue training, if specified
     model = mrcnn_training.load_model(model_id, config, mode="training") if model_id else None
     layers = layers if layers else 'heads'
     # train model
-    log_dir = mrcnn_training.train(train, val, config, augment=augment, use_coco_weights=transfer_learning, checkpoint_model=model, ft_train_set=ft_train, layers=layers, save_all=save_all)
-
-    log_string = f"Train MRCNN on {'+'.join(subsets)} {'aug' if augment else ''} {'tl' if transfer_learning else ''}Train images:{len(train.image_ids)} Finetuned on:{'+'.join(ft_subsets) if ft_subsets else 'none'} Layers:{layers}"
-    with open(logfile, 'w+') as f:
-        f.write(log_string)
-        f.write(log_dir)
-        f.write("\n")
+    mrcnn_training.train(train, val, config, augment=augment, use_coco_weights=transfer_learning, checkpoint_model=model, ft_train_set=ft_train, layers=layers, save_all=save_all)
 
 
 def prepare_subsets(subsets: list, override: bool = False, split_scenes: bool = False):
