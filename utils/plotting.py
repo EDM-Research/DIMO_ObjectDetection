@@ -246,6 +246,7 @@ def experiment_3():
 
     fig.savefig('../plots/exp3.png', dpi=300)
 
+
 def experiment_4():
     fig, ax = plt.subplots()
 
