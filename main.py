@@ -21,7 +21,7 @@ DIMO_PATH = config['USER_SETTINGS']['dimo_path']
 
 
 logfile = "log.txt"
-logging.basicConfig(filename=logfile, encoding='utf-8')
+logging.basicConfig(filename=logfile, level=logging.DEBUG, format='%(message)s')
 
 
 def test_batch(batch_file: str):

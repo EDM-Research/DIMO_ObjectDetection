@@ -95,6 +95,8 @@ def train(train_set: DIMODataset, val_set: DIMODataset, config: config.Config, u
                     custom_callbacks=custom_callbacks,
                     save_all=save_all)
 
+    logging.info("==========================================================================")
+
 
 def get_epoch_no(file_name: str) -> int:
     return int(file_name.split('.')[0].split('_')[-1])
