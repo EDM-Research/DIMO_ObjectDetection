@@ -13,6 +13,7 @@ from training import mrcnn as mrcnn_training
 import tensorflow.keras.backend as K
 from utils import plotting
 import logging
+from utils import umap_tools
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -156,18 +157,22 @@ def compare_feature_maps(model_id: str):
     titles = ["real", "synth", "synth, rand pose", "synth, rand light", "synth, rand all"]
 
     for level in range(4):
+        total_dataset, val, _ = data.mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets, train_image_counts=[1755] * len(subsets))
+        config = data.mrcnn_dimo.get_test_dimo_config(total_dataset, model_id)
+        model = mrcnn_training.load_model(model_id, config)
+
+        reducer = umap_tools.get_reducer(total_dataset, model, config, level)
+
         embeddings = []
         for set in subsets:
-            dataset, val, _ = data.mrcnn_dimo.get_dimo_datasets(DIMO_PATH, [set], train_image_counts=[1755])
-            config = data.mrcnn_dimo.get_test_dimo_config(dataset, model_id)
+            subset_dataset, val, _ = data.mrcnn_dimo.get_dimo_datasets(DIMO_PATH, [set], train_image_counts=[1755])
+            config = data.mrcnn_dimo.get_test_dimo_config(subset_dataset, model_id)
 
-            model = mrcnn_training.load_model(model_id, config)
-
-            embedding = detection.get_umap(dataset, model, config, level=level)
+            embedding = umap_tools.reduce_dimension(subset_dataset, reducer, model, config, level)
             embeddings.append(embedding)
 
-            del model
-            K.clear_session()
+        del model
+        K.clear_session()
         embeddings_per_level.append(embeddings)
 
     plotting.plot_feature_maps(embeddings_per_level, titles)
