@@ -30,8 +30,8 @@ class DimoLoader:
                 result.append(model)
             return result
 
-    def load_scenes(self, path):
-        return [self.load_scene(path) for path in sorted(path.glob('[!.]*')) if os.path.isdir(path)]
+    def load_scenes(self, base_path):
+        return [self.load_scene(path) for path in sorted(base_path.glob('[!.]*')) if os.path.isdir(path)]
 
     def load_scene(self, path):
         scene_id = int(path.name)
