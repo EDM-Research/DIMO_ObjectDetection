@@ -42,6 +42,7 @@ The following flags can be used:
 - `-o` override existing masks if there are found
 - `-s` If this flag is set, all images of the same scene will be placed in the same set.
 
+The dimo path from the config file can be overwritten with the `--dimo_path` parameter. This is possible for all commands.
 ### Inspecting data
 To inspect one or more datasets you can use the following command:
 ```

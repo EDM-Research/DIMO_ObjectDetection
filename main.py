@@ -49,15 +49,15 @@ def test_batch(batch_file: str):
 
 
 def train_subsets(subsets: list, model_id: str = None, augment: bool = False, transfer_learning: bool = False,
-                  train_image_counts: list = None, ft_subsets: list = None, ft_image_count: int = None, layers: str = None, save_all: bool = False):
-
+                  train_image_counts: list = None, ft_subsets: list = None, ft_image_count: int = None, layers: str = None, save_all: bool = False, dimo_path: str = None):
+    target_dimo_path = dimo_path if dimo_path is not None else DIMO_PATH
     # load training set
-    train, val, config = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets, train_image_counts=train_image_counts)
+    train, val, config = mrcnn_dimo.get_dimo_datasets(target_dimo_path, subsets, train_image_counts=train_image_counts)
 
     # if specified, load fintuning dataset
     ft_train = None
     if ft_subsets:
-        ft_train, _, _ = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, ft_subsets, train_image_counts=ft_image_count)
+        ft_train, _, _ = mrcnn_dimo.get_dimo_datasets(target_dimo_path, ft_subsets, train_image_counts=ft_image_count)
 
     # load model to continue training, if specified
     model = mrcnn_training.load_model(model_id, config, mode="training") if model_id else None
@@ -66,13 +66,15 @@ def train_subsets(subsets: list, model_id: str = None, augment: bool = False, tr
     mrcnn_training.train(train, val, config, augment=augment, use_coco_weights=transfer_learning, checkpoint_model=model, ft_train_set=ft_train, layers=layers, save_all=save_all)
 
 
-def prepare_subsets(subsets: list, override: bool = False, split_scenes: bool = False):
-    #data_utils.create_dimo_masks(DIMO_PATH, subsets, override=override)
-    data_utils.create_dimo_train_split(DIMO_PATH, subsets, seed=10, split_scenes=split_scenes)
+def prepare_subsets(subsets: list, override: bool = False, split_scenes: bool = False, dimo_path: str = None):
+    target_dimo_path = dimo_path if dimo_path is not None else DIMO_PATH
+    #data_utils.create_dimo_masks(target_dimo_path, subsets, override=override)
+    data_utils.create_dimo_train_split(target_dimo_path, subsets, seed=10, split_scenes=split_scenes)
 
 
-def show_subsets(subsets: list):
-    dataset_train, dataset_val, config = mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets)
+def show_subsets(subsets: list, dimo_path: str = None):
+    target_dimo_path = dimo_path if dimo_path is not None else DIMO_PATH
+    dataset_train, dataset_val, config = mrcnn_dimo.get_dimo_datasets(target_dimo_path, subsets)
     config.USE_MINI_MASK = False
 
     print(f"training images: {len(dataset_train.image_ids)}")
@@ -86,7 +88,7 @@ def show_subsets(subsets: list):
         mrcnn_visualise.display_instances(image, gt_bbox, gt_mask, gt_class_id, dataset_train.class_names, title=image_info['id'])
 
 
-def test_subsets(subsets: list, model_id: str, save_results: bool = False):
+def test_subsets(subsets: list, model_id: str, save_results: bool = False, dimo_path: str = None):
     dataset = data.mrcnn_dimo.get_test_dimo_dataset(DIMO_PATH, subsets)
     config = data.mrcnn_dimo.get_test_dimo_config(dataset, model_id)
 
