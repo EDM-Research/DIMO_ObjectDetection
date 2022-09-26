@@ -141,3 +141,5 @@ models/
 results/
 plots/
 config.ini
+
+*.bat
