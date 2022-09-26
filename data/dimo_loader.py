@@ -30,8 +30,8 @@ class DimoLoader:
                 result.append(model)
             return result
 
-    def load_scenes(self, path):
-        return [self.load_scene(path) for path in sorted(path.glob('[!.]*')) if os.path.isdir(path)]
+    def load_scenes(self, base_path):
+        return [self.load_scene(path) for path in sorted(base_path.glob('[!.]*')) if os.path.isdir(path)]
 
     def load_scene(self, path):
         scene_id = int(path.name)
@@ -69,7 +69,9 @@ class DimoLoader:
 
     def load_camera(self, camera):
         K = np.reshape(camera['cam_K'], (3, 3))
-        T = self.load_pose(camera['cam_R_w2c'], camera['cam_t_w2c'])
+        T = None
+        if 'cam_R_w2c' in camera.keys() and 'cam_t_w2c' in camera.keys():
+            T = self.load_pose(camera['cam_R_w2c'], camera['cam_t_w2c'])
         return {
             'K': K,
             'cam_2world': T
