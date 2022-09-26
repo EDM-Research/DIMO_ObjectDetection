@@ -12,7 +12,6 @@ import numpy as np
 from training import mrcnn as mrcnn_training
 import tensorflow.keras.backend as K
 from utils import plotting
-import logging
 import logging.config
 from utils import umap_tools
 
@@ -21,9 +20,6 @@ config.read('config.ini')
 
 DIMO_PATH = config['USER_SETTINGS']['dimo_path']
 
-
-logfile = "log.txt"
-logging.basicConfig(filename=logfile, level=logging.DEBUG, format='%(message)s')
 
 logfile = "log.txt"
 logging.basicConfig(filename=logfile, level=logging.INFO, format='%(message)s')
