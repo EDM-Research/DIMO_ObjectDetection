@@ -4,10 +4,10 @@ from training import augmentation
 import os
 import configparser
 from mrcnn.config import Config
+import logging
+
 
 COCO_WEIGHTS_PATH = 'weights/mask_rcnn_coco.h5'
-
-import logging
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # FATAL
 logging.getLogger('tensorflow').setLevel(logging.FATAL)

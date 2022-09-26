@@ -13,6 +13,7 @@ from training import mrcnn as mrcnn_training
 import tensorflow.keras.backend as K
 from utils import plotting
 import logging
+import logging.config
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -21,8 +22,11 @@ DIMO_PATH = config['USER_SETTINGS']['dimo_path']
 
 
 logfile = "log.txt"
-logging.basicConfig(filename=logfile, level=logging.DEBUG, format='%(message)s')
-
+logging.basicConfig(filename=logfile, level=logging.INFO, format='%(message)s')
+logging.config.dictConfig({
+    'version': 1,
+    'disable_existing_loggers': True,
+})
 
 def test_batch(batch_file: str):
     model_tests = file_io.read_test_batch(batch_file)
