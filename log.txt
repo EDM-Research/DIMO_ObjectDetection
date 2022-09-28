@@ -1,8 +1,0 @@
-Training model D:/Models/DIMO\dimo20220926T0911
-	Training on sim_jaigo_rand_light_rand_pose
-	Training images: 100
-	Augmentation: True)
-	Transfer Learning: True
-
-	Training layers: heads
-
