@@ -158,8 +158,8 @@ def test_epochs(subsets: list, models: list):
 
 def compare_feature_maps(model_id: str):
     embeddings_per_level = []
-    subsets = ["real_jaigo_000-150", "sim_jaigo_real_light_real_pose", "sim_jaigo_real_light_rand_pose", "sim_jaigo_rand_light_real_pose", "sim_jaigo_rand_light_rand_pose"]
-    titles = ["real", "synth", "synth, rand pose", "synth, rand light", "synth, rand all"]
+    subsets = ["real_jaigo_000-150"]#, "sim_jaigo_real_light_real_pose", "sim_jaigo_real_light_rand_pose", "sim_jaigo_rand_light_real_pose", "sim_jaigo_rand_light_rand_pose"]
+    titles = ["real"]#, "synth", "synth, rand pose", "synth, rand light", "synth, rand all"]
 
     for level in range(4):
         total_dataset, val, _ = data.mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets, train_image_counts=[1755] * len(subsets))
@@ -184,4 +184,4 @@ def compare_feature_maps(model_id: str):
 
 
 if __name__ == "__main__":
-    compare_feature_maps("dimo20220708T1446")
+    compare_feature_maps("dimo20220315T0958")

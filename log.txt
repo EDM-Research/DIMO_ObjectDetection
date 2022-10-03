@@ -1,0 +1,43 @@
+Training model D:/Models/DIMO\dimo20220928T1616
+	Training on sim_jaigo_rand_light_rand_pose
+	Training images: 200
+	Augmentation: True)
+	Transfer Learning: True
+
+	Training layers: heads
+
+==========================================================================
+Training model D:/Models/DIMO\dimo20220929T2139
+	Training on sim_jaigo_rand_light_rand_pose
+	Training images: 400
+	Augmentation: True)
+	Transfer Learning: True
+
+	Training layers: heads
+
+==========================================================================
+Training model D:/Models/DIMO\dimo20221001T0217
+	Training on sim_jaigo_rand_light_rand_pose
+	Training images: 800
+	Augmentation: True)
+	Transfer Learning: True
+
+	Training layers: heads
+
+==========================================================================
+Training model D:/Models/DIMO\dimo20221002T0711
+	Training on sim_jaigo_rand_light_rand_pose
+	Training images: 1600
+	Augmentation: True)
+	Transfer Learning: True
+
+	Training layers: heads
+
+Training model E:/projects/DIMO_ObjectDetection/models\dimo20221003T1710
+	Training on real_jaigo_000-150
+	Training images: 1755
+	Augmentation: False)
+	Transfer Learning: False
+
+	Training layers: all
+

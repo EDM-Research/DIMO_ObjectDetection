@@ -10,7 +10,7 @@ from training.detection import run_feature_detector
 
 def get_reducer(dataset: Dataset, model: modellib.MaskRCNN, config: Config, level: int = 0) -> umap.UMAP:
     assert 0 <= level <= 3
-    samples = 200
+    samples = 5
 
     feature_detector = model.get_feature_detector()
     features = []
@@ -46,12 +46,12 @@ def reduce_dimension(dataset: Dataset, reducer: umap.UMAP, model: modellib.MaskR
     print("Computing embeddings for other images")
     batch_count = math.ceil(len(ids) / batch_size)
 
-    embeddings = []
+    embeddings = None
     for batch_no in range(batch_count):
         print(f"Computing features for batch {batch_no}/{batch_count}")
         features = []
 
-        for i, image_id in enumerate(ids[batch_no * batch_size:min(batch_size + (batch_no + 1), len(ids))]):
+        for i, image_id in enumerate(ids[batch_no * batch_size:min(batch_size * (batch_no + 1), len(ids))]):
             image, *_ = modellib.load_image_gt(dataset, config, image_id)
             output = run_feature_detector(feature_detector, model, image)[level]
             features.append(output.flatten())
@@ -59,6 +59,6 @@ def reduce_dimension(dataset: Dataset, reducer: umap.UMAP, model: modellib.MaskR
         print(f"Computing embeddings for batch {batch_no}")
         embedding = reducer.transform(np.array(features))
 
-        embeddings = np.concatenate((embedding, embeddings))
+        embeddings = embedding if embeddings is None else np.concatenate((embedding, embeddings))
 
     return embeddings
