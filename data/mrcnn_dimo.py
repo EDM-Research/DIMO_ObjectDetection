@@ -3,6 +3,11 @@ import random
 
 import cv2
 
+try:
+    from cv2 import cv2
+except ImportError:
+    pass
+
 from mrcnn import utils, visualize, config, model
 from data.dimo_loader import DimoLoader
 from pathlib import Path

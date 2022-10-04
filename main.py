@@ -156,32 +156,5 @@ def test_epochs(subsets: list, models: list):
         file_io.write_model_epochs(model_id, aps, tested_epochs)
 
 
-def compare_feature_maps(model_id: str):
-    embeddings_per_level = []
-    subsets = ["real_jaigo_000-150", "sim_jaigo_real_light_real_pose", "sim_jaigo_real_light_rand_pose", "sim_jaigo_rand_light_real_pose", "sim_jaigo_rand_light_rand_pose"]
-    titles = ["real", "synth", "synth, rand pose", "synth, rand light", "synth, rand all"]
-
-    for level in range(4):
-        total_dataset, val, _ = data.mrcnn_dimo.get_dimo_datasets(DIMO_PATH, subsets, train_image_counts=[1755] * len(subsets))
-        config = data.mrcnn_dimo.get_test_dimo_config(total_dataset, model_id)
-        model = mrcnn_training.load_model(model_id, config)
-
-        reducer = umap_tools.get_reducer(total_dataset, model, config, level)
-
-        embeddings = []
-        for set in subsets:
-            subset_dataset, val, _ = data.mrcnn_dimo.get_dimo_datasets(DIMO_PATH, [set], train_image_counts=[1755])
-            config = data.mrcnn_dimo.get_test_dimo_config(subset_dataset, model_id)
-
-            embedding = umap_tools.reduce_dimension(subset_dataset, reducer, model, config, level)
-            embeddings.append(embedding)
-
-        del model
-        K.clear_session()
-        embeddings_per_level.append(embeddings)
-
-    plotting.plot_feature_maps(embeddings_per_level, titles)
-
-
 if __name__ == "__main__":
-    compare_feature_maps("dimo20220315T0958")
+    pass
