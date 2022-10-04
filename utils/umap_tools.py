@@ -10,7 +10,7 @@ from training.detection import run_feature_detector
 
 def get_reducer(dataset: Dataset, model: modellib.MaskRCNN, config: Config, level: int = 0) -> umap.UMAP:
     assert 0 <= level <= 3
-    samples = 5
+    samples = 300
 
     feature_detector = model.get_feature_detector()
     features = []

@@ -311,7 +311,7 @@ def plot_feature_maps(embeddings_per_level: List[np.array], titles: list = None)
 
     for i, level_embeddings in enumerate(embeddings_per_level):
         for embedding, title in zip(level_embeddings, titles):
-            ax[i].scatter(embedding[:,0], embedding[:,1], label=title, s=1)
+            ax[i].scatter(embedding[:,0], embedding[:,1], label=title, s=0.5)
             ax[i].set_title(f"Level {i}")
 
     ax[-1].legend(loc='center left', bbox_to_anchor=(1, 0.5))
