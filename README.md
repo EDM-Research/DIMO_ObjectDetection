@@ -85,3 +85,21 @@ A model can be evaluated on a test set with the following command. The mAP value
 ```
 python dimo_detection.py test --subsets subset1 subsets2 --model model
 ```
+
+## Citation
+Use this bibtex to cite this repository:
+```
+@inproceedings{dimo_objectdetection_2022,
+	title={Analysis of Training Object Detection Models with Synthetic Data},
+	author={Vanherle Bram, Moonen Steven, Van Reeth Frank and Nick Michiels},
+	year={2022},
+	month={November},
+	pages={},
+	articleno={},
+	numpages={},
+	booktitle={Proceedings of the British Machine Vision Conference (BMVC)},
+	publisher={BMVA Press},
+	address = {},
+	editor={},
+}
+```
