@@ -1,5 +1,5 @@
 # DIMO Object Detection
-Object detection for the DIMO dataset. Uses the Mask-RCNN model.
+Object detection for the DIMO dataset. Uses the Mask-RCNN model. This is an implementation of [Analysis of Training Object Detection Models with Synthetic Data](https://bmvc2022.org/programme/papers/), published in BMVC: British Machine Vision Conference, 2022.
 
 ## Installation
 First clone the repo using
