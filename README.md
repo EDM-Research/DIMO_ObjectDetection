@@ -1,5 +1,5 @@
 # DIMO Object Detection
-Object detection for the DIMO dataset. Uses the Mask-RCNN model. This is an implementation of [Analysis of Training Object Detection Models with Synthetic Data](https://bmvc2022.org/programme/papers/), published in BMVC: British Machine Vision Conference, 2022.
+Object detection for the DIMO dataset. Uses the Mask-RCNN model. This is an implementation of [Analysis of Training Object Detection Models with Synthetic Data](https://bmvc2022.mpi-inf.mpg.de/833/), published in BMVC: British Machine Vision Conference, 2022.
 
 ## Installation
 First clone the repo using
@@ -89,17 +89,12 @@ python dimo_detection.py test --subsets subset1 subsets2 --model model
 ## Citation
 Use this bibtex to cite this repository:
 ```
-@inproceedings{dimo_objectdetection_2022,
-	title={Analysis of Training Object Detection Models with Synthetic Data},
-	author={Vanherle Bram, Moonen Steven, Van Reeth Frank and Nick Michiels},
-	year={2022},
-	month={November},
-	pages={},
-	articleno={},
-	numpages={},
-	booktitle={Proceedings of the British Machine Vision Conference (BMVC)},
-	publisher={BMVA Press},
-	address = {},
-	editor={},
+@inproceedings{Vanherle_2022_BMVC,
+	author    = {Bram Vanherle and Steven Moonen and Frank Van Reeth and Nick Michiels},
+	title     = {Analysis of Training Object Detection Models with Synthetic Data},
+	booktitle = {33rd British Machine Vision Conference 2022, {BMVC} 2022, London, UK, November 21-24, 2022},
+	publisher = {{BMVA} Press},
+	year      = {2022},
+	url       = {https://bmvc2022.mpi-inf.mpg.de/0833.pdf}
 }
 ```
